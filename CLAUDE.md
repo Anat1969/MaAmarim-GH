@@ -34,7 +34,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 
 ```bash
 npm run build
-npx vite preview --port 4173 & node tests/e2e.mjs     # 35 checks, reads live data, writes nothing
+npx vite preview --port 4173 & node tests/e2e.mjs     # 40 checks, reads live data, writes nothing
 node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```
@@ -53,7 +53,7 @@ Playwright comes from the global install: `ln -s "$(npm root -g)/playwright" nod
 | `mag_source_watch`, fn `mag_unlinked()` | the watch: writing sources not in the magazine yet (ignore / pending) |
 | `mag_log` | safety net: every write with the row as it was before |
 
-Sources today: `culture_articles` (תרבות וגילוי, 85), `mahut_articles` published (מהות, 20), `ishy_articles` published
+Sources today: `culture_articles` (מושגי תרבות, 85; the app is cultura-GH on Pages, NOT תרבות וגילוי), `mahut_articles` published (מהות, 20), `ishy_articles` published
 (מהמרחב הפנימי, 5), `chok_articles` joined to `chok_laws` (חוקי התנהגות, 2; key `chok:<law_id>`, the body is one text with
 `## heading` blocks that each end in a `**insight**` line; image from `chok_images`). `radar_articles` (relevant, with insight) is not an article of hers: it shows only as "מה קורא העולם" beside
 an article of the same topic. To add a source: one more `union all` in the view, an entry in `src/lib/sources.ts`, a template in
@@ -66,6 +66,11 @@ that are files, not tables (`pending`). The library shows it on the editing desk
 e2e test fails while a writing table is left outside. When building or upgrading an app that writes articles, connect it
 here as part of the delivery. A source the code does not know is dropped in `loadData`, so a view change never breaks the page;
 check a view change first through a copy (`VITE_MAG_VIEW=mag_articles_next npm run build`), then replace the real view after deploy.
+LINK TO THE SOURCE AND ITS IMAGE (Anat, 2026-11-21): every article links to itself in the app that wrote it, not to the
+app's home: `originUrl()` in `src/lib/sources.ts` (culture `#/article/<id>`, mahut and ishy `#/a/<id>`, chok
+`/articles?law=<id>`), shown in the reader's top row ("המאמר במקור") and in the closing line. When adding a source, find its
+single-article address and open it in a browser before delivery. The image is the one the source app shows, wherever it keeps
+it: ishy has no image of its own and shows the case image from `merhav_readings` (synthesis first, then a lens).
 Not yet in: creations.json of Amirot / Refua / Tzuna / PrasNovel / Olam (static files, not tables), TAARUCHA works (short captions), Drive.
 
 RLS: public read, no write policies. Every write goes through the edge function `mag-edit` (`supabase/functions/mag-edit`,

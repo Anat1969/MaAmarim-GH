@@ -50,6 +50,17 @@ ok(await page.locator('.watch').count() === 0, 'readers do not see the sources w
 await page.locator('.card').first().click();
 await page.waitForSelector('.r-body .sec');
 ok(await page.locator('.r-body .sec h3').count() >= 3 && await page.locator('.r-body .sec .insight').count() >= 1, 'a law article opens in its own template, with sections and insight lines');
+const origin = await page.locator('.crumbs a.origin').getAttribute('href');
+ok(/chok-tarbut\.vercel\.app\/articles\?law=[a-z0-9-]+$/.test(origin ?? ''), `the reader links to this article in the app that wrote it (${origin})`);
+for (const src of ['culture', 'mahut', 'ishy']) {
+  await page.goto(`${BASE}/?view=library&src=${src}`, { waitUntil: 'networkidle' });
+  await page.locator('.card').first().click();
+  await page.waitForSelector('.crumbs a.origin');
+  const h = await page.locator('.crumbs a.origin').getAttribute('href');
+  ok(/#\/(article|a)\/[0-9a-f-]{36}$/.test(h ?? ''), `${src}: direct link to the article in its own app`);
+}
+await page.goto(`${BASE}/?view=library&src=ishy`, { waitUntil: 'networkidle' });
+ok(await page.locator('.card .card-img img').count() >= 1, 'an ishy article shows the image its own app shows (from the case readings)');
 await page.evaluate(() => localStorage.setItem('hut-desk', '1'));
 await page.goto(`${BASE}/?view=library`, { waitUntil: 'networkidle' });
 await page.waitForSelector('.watch');

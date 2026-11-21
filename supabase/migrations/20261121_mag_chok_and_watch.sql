@@ -29,7 +29,10 @@ with base as (
   union all
   select 'ishy:' || i.id::text, 'ishy',
          coalesce(i.content->>'title', i.case_title), i.case_title, i.content->>'lede', i.content->>'quote',
-         i.image_url, null,
+         -- the app shows the image of the case in המרחב הפנימי: the synthesis reading first, then any lens
+         coalesce(i.image_url, (select r.images->-1->>'url' from merhav_readings r
+                                 where r.case_id = i.case_id and jsonb_array_length(coalesce(r.images, '[]'::jsonb)) > 0
+                                 order by (r.lens = 'synthesis') desc, r.updated_at desc limit 1)), null,
          'ishy', i.created_at,
          (i.content - 'visual_prompt_he') || jsonb_build_object('share', i.share)
   from ishy_articles i where i.published

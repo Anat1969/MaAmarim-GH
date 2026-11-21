@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Article, Data, World } from '../lib/types';
 import { edit, img, loadRaw, loadWorld } from '../lib/supabase';
-import { SOURCES, RADAR } from '../lib/sources';
+import { SOURCES, RADAR, originUrl } from '../lib/sources';
 import { type Route } from '../lib/route';
 import { dayMonth, marked, plain } from '../lib/text';
 import ArticleBody, { facts } from './ArticleBody';
@@ -89,7 +89,9 @@ export default function Reader({ data, article, route, desk, onSaved, onError, o
     <main className="reader" style={{ '--c': topic?.color ?? '#77756F' } as React.CSSProperties}>
       <div className="crumbs">
         <Go to={ctx.back} className="btn back">חזרה אל: {ctx.name}</Go>
-        <SourceTag source={article.source} />
+        <a className="origin" href={originUrl(article)} target="_blank" rel="noreferrer" title={`פתיחת המאמר באפליקציה ${SOURCES[article.source].label}`}>
+          <span className="mono">המאמר במקור</span>{SOURCES[article.source].label}
+        </a>
         <TopicDot topic={topic} />
         <span className="mono">{dayMonth(article.created_at)} {new Date(article.created_at).getFullYear()}</span>
         {desk && (
@@ -164,7 +166,7 @@ export default function Reader({ data, article, route, desk, onSaved, onError, o
           : failed ? <div className="empty-state"><h2>המאמר לא נטען</h2><p>החיבור למאגר נכשל. רענון הדף מנסה שוב.</p><button className="btn on" onClick={() => location.reload()}>רענון</button></div>
           : <p className="mono loading">טוען את המאמר</p>}
         <p className="origin-line">
-          נכתב באפליקציה <a href={SOURCES[article.source].url} target="_blank" rel="noreferrer">{SOURCES[article.source].label}</a>. {SOURCES[article.source].about} המגזין קורא אותו משם, ולא מחזיק עותק.
+          נכתב באפליקציה <a href={SOURCES[article.source].url} target="_blank" rel="noreferrer">{SOURCES[article.source].label}</a>. {SOURCES[article.source].about} המגזין קורא אותו משם, ולא מחזיק עותק. <a href={originUrl(article)} target="_blank" rel="noreferrer">לפתיחת המאמר הזה שם</a>.
         </p>
       </article>
 
