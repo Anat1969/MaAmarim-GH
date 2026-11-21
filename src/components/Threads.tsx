@@ -70,7 +70,7 @@ export default function Threads({ data, route, desk, onSaved, onError }: Props) 
         </header>
         <div className="weave-scroll">
           <div className="weave-box" style={{ '--n': Math.max(...[true, false].map((top) => [...pos.values()].filter((p) => p.top === top).length), 1) } as React.CSSProperties}>
-            <span className="rail-name mono" style={{ top: `${(TOP / H) * 100}%` }}>תרבות וגילוי</span>
+            <span className="rail-name mono" style={{ top: `${(TOP / H) * 100}%` }}>מושגי תרבות</span>
             <span className="rail-name mono" style={{ top: `${(BOTTOM / H) * 100}%` }}>מהות, מהמרחב הפנימי</span>
             <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label="מפת החוטים בין המאמרים">
               <line x1={PADL} x2={W - PADR} y1={TOP} y2={TOP} className="rail" />

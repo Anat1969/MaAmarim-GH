@@ -388,3 +388,9 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .watch li { display: flex; gap: 0.8rem; align-items: baseline; flex-wrap: wrap; font-size: 0.92rem; }
 .watch .small .mono { margin-inline-end: 0.7rem; }
 @media print { .watch { display: none; } }
+
+/* The way back to the app that wrote the article: one clear link in the reader's top row. */
+.origin { display: inline-flex; align-items: baseline; gap: 0.5em; background: var(--white); box-shadow: 0 1px 2px rgb(46 46 43 / 12%); padding: 0.35em 0.8em; font-size: 0.9rem; font-weight: 500; text-decoration: none; color: var(--ink); border-bottom: 2px solid var(--gold); transition: box-shadow 0.15s; }
+.origin:hover { box-shadow: 0 0 0 2px var(--gold); }
+.origin .mono { color: var(--ink2); }
+@media print { .origin { display: none; } }
