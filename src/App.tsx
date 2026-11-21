@@ -80,7 +80,7 @@ export default function App() {
           ? article
             ? <Reader data={data} article={article} route={route} desk={desk} onSaved={onSaved} onError={onError} onThread={setThreadFrom} />
             : <div className="empty-state page"><h2>המאמר הזה כבר לא במגזין</h2><p>ייתכן שהוסר באפליקציה שבה נכתב.</p><Go to={{ view: 'library' }} className="btn on">לכל המאמרים</Go></div>
-          : route.view === 'library' ? <Library data={data} route={route} />
+          : route.view === 'library' ? <Library data={data} route={route} desk={desk} />
           : route.view === 'threads' ? <Threads data={data} route={route} desk={desk} onSaved={onSaved} onError={onError} />
           : route.view === 'issues' ? <Issues data={data} desk={desk} onSaved={onSaved} onError={onError} />
           : issue ? <Cover key={issue.id} data={data} issue={issue} desk={desk} onSaved={onSaved} onError={onError} />

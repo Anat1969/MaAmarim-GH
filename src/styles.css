@@ -379,3 +379,12 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 @media print {
   html, body { height: auto; }
 }
+
+/* The watch of the editing desk: writing sources that are not in the magazine yet. */
+.watch { margin-top: 1.2rem; background: var(--white); box-shadow: 0 1px 2px rgb(46 46 43 / 8%); padding: 0.9rem 1.1rem; display: grid; gap: 0.5rem; border-inline-start: 4px solid var(--line); }
+.watch.alert { border-inline-start-color: var(--gold); background: var(--marker); }
+.watch h2 { font-family: var(--serif); font-weight: 500; font-size: 1.15rem; }
+.watch ul { display: grid; gap: 0.3rem; list-style: none; }
+.watch li { display: flex; gap: 0.8rem; align-items: baseline; flex-wrap: wrap; font-size: 0.92rem; }
+.watch .small .mono { margin-inline-end: 0.7rem; }
+@media print { .watch { display: none; } }

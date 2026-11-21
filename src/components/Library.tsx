@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
-import type { Article, Data } from '../lib/types';
+import { useEffect, useMemo, useState } from 'react';
+import type { Article, Data, Unlinked } from '../lib/types';
+import { loadUnlinked } from '../lib/supabase';
 import { SOURCES, SOURCE_IDS } from '../lib/sources';
 import { go, type Route } from '../lib/route';
 import { monthYear, plain } from '../lib/text';
@@ -43,7 +44,27 @@ const GROUPS: { id: Route['group']; label: string }[] = [
   { id: 'date', label: 'לפי תאריך' },
 ];
 
-export default function Library({ data, route }: { data: Data; route: Route }) {
+/** The watch: shown only on the editing desk. A new writing app cannot stay outside the magazine unnoticed. */
+function Watch() {
+  const [list, setList] = useState<Unlinked[] | null>(null);
+  useEffect(() => { loadUnlinked().then(setList).catch(() => setList(null)); }, []);
+  if (!list) return null;
+  const fresh = list.filter((u) => u.status === 'new');
+  const pending = list.filter((u) => u.status === 'pending');
+  return (
+    <section className={`watch ${fresh.length ? 'alert' : ''}`} aria-label="מקורות שעוד לא מחוברים">
+      <h2>{fresh.length ? `${fresh.length === 1 ? 'מקור חדש אחד' : `${fresh.length} מקורות חדשים`} עוד לא במגזין` : 'כל מקור כתיבה שנמצא במאגר מחובר למגזין'}</h2>
+      {fresh.length > 0 && (
+        <ul>
+          {fresh.map((u) => <li key={u.name}><b className="mono">{u.name}</b><span>{u.row_count ?? 0} רשומות. מבקשים בשיחת הפיתוח: "חבר את {u.name} לחוט".</span></li>)}
+        </ul>
+      )}
+      {pending.length > 0 && <p className="small"><span className="mono">ממתינים, שמורים בקובץ ולא בטבלה</span>{pending.map((u) => u.label).join(' · ')}</p>}
+    </section>
+  );
+}
+
+export default function Library({ data, route, desk = false }: { data: Data; route: Route; desk?: boolean }) {
   const groups = useMemo(() => grouped(data, route), [data, route]);
   const total = groups.reduce((n, g) => n + g.list.length, 0);
   const set = (patch: Partial<Route>) => go({ ...route, view: 'library', a: null, ...patch }, true);
@@ -86,6 +107,8 @@ export default function Library({ data, route }: { data: Data; route: Route }) {
           <span className="mono sorted">מסודר {groupLabel}. צבע הפס: הנושא.</span>
         </div>
       </div>
+
+      {desk && <Watch />}
 
       {groups.map((g) => (
         <section key={g.id} className="group" style={{ '--c': g.color ?? '#2E2E2B' } as React.CSSProperties}>

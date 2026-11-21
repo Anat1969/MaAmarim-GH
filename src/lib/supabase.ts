@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Article, Data, Issue, IssueItem, Thread, Topic, World } from './types';
+import { SOURCES } from './sources';
+import type { Article, Data, Issue, IssueItem, Thread, Topic, Unlinked, World } from './types';
 
 // cultura-GH: the shared project of Anat's apps. The magazine owns only the mag_ tables.
 export const SUPABASE_URL = 'https://ktqmwpbzcnzkhjskqisy.supabase.co';
@@ -9,6 +10,8 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
+// The view can be swapped for a check before a schema change goes live (VITE_MAG_VIEW).
+const VIEW = (import.meta.env.VITE_MAG_VIEW as string | undefined) || 'mag_articles';
 const LIST = 'key,source,title,kicker,lede,quote,image,image2,hint,created_at,topic_id';
 
 async function all<T>(q: PromiseLike<{ data: unknown; error: { message: string } | null }>): Promise<T[]> {
@@ -19,20 +22,29 @@ async function all<T>(q: PromiseLike<{ data: unknown; error: { message: string }
 
 export async function loadData(): Promise<Data> {
   const [articles, topics, issues, items, threads] = await Promise.all([
-    all<Article>(supabase.from('mag_articles').select(LIST).order('created_at', { ascending: false })),
+    all<Article>(supabase.from(VIEW).select(LIST).order('created_at', { ascending: false })),
     all<Topic>(supabase.from('mag_topics').select('*').order('position')),
     all<Issue>(supabase.from('mag_issues').select('*').order('number', { ascending: false })),
     all<IssueItem>(supabase.from('mag_issue_items').select('*').order('position')),
     all<Thread>(supabase.from('mag_threads').select('*').order('created_at')),
   ]);
-  return { articles, byKey: new Map(articles.map((a) => [a.key, a])), topics, issues, items, threads };
+  // A source the code does not know yet must not break the page: its articles wait until it has a template.
+  const known = articles.filter((a) => a.source in SOURCES);
+  return { articles: known, byKey: new Map(known.map((a) => [a.key, a])), topics, issues, items, threads };
 }
 
 /** The body of one article, in the shape its own app keeps it. */
 export async function loadRaw(key: string): Promise<Record<string, unknown> | null> {
-  const { data, error } = await supabase.from('mag_articles').select('raw').eq('key', key).maybeSingle();
+  const { data, error } = await supabase.from(VIEW).select('raw').eq('key', key).maybeSingle();
   if (error) throw new Error(error.message);
   return (data?.raw as Record<string, unknown>) ?? null;
+}
+
+/** The watch of the editing desk: writing sources that are not in the magazine yet. */
+export async function loadUnlinked(): Promise<Unlinked[]> {
+  const { data, error } = await supabase.rpc('mag_unlinked');
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Unlinked[];
 }
 
 /** "מה קורא העולם": what the radar found outside on the same topic. */
