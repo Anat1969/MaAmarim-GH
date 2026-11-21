@@ -43,6 +43,21 @@ await page.locator('.search input').fill('אין-מאמר-כזה');
 await page.waitForTimeout(300);
 ok(await page.locator('.empty-state').isVisible(), 'empty search explains and offers a way back');
 
+await page.goto(`${BASE}/?view=library&src=chok`, { waitUntil: 'networkidle' });
+const chok = await page.locator('.card').count();
+ok(chok >= 1, `the fourth source, חוקי התנהגות, is in the library (${chok})`);
+ok(await page.locator('.watch').count() === 0, 'readers do not see the sources watch');
+await page.locator('.card').first().click();
+await page.waitForSelector('.r-body .sec');
+ok(await page.locator('.r-body .sec h3').count() >= 3 && await page.locator('.r-body .sec .insight').count() >= 1, 'a law article opens in its own template, with sections and insight lines');
+await page.evaluate(() => localStorage.setItem('hut-desk', '1'));
+await page.goto(`${BASE}/?view=library`, { waitUntil: 'networkidle' });
+await page.waitForSelector('.watch');
+const watch = await page.locator('.watch').innerText();
+ok(!watch.includes('chok_articles'), 'the watch no longer lists chok_articles as unconnected');
+ok(await page.locator('.watch.alert').count() === 0, `no writing table is left outside the magazine: ${watch.split('\n')[0]}`);
+await page.evaluate(() => localStorage.removeItem('hut-desk'));
+
 await page.goto(`${BASE}/?view=threads`, { waitUntil: 'networkidle' });
 ok(await page.locator('.arc').count() >= 1, 'threads map draws the threads');
 await page.locator('.t-row').nth(1).click();

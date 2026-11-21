@@ -31,7 +31,7 @@ const upsert = (table: string, row: unknown) => rest('POST', table, row, 'resolu
 const log = (action: string, payload: unknown, before: unknown) =>
   rest('POST', 'mag_log', { action, payload, before: before ?? null }, 'return=minimal');
 
-const KEY = /^(culture|mahut|ishy):[0-9a-f-]{36}$/;
+const KEY = /^((culture|mahut|ishy):[0-9a-f-]{36}|chok:[a-z0-9-]{1,60})$/;
 const ID = /^[a-z0-9-]{1,60}$/;
 const UUID = /^[0-9a-f-]{36}$/;
 const text = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max);
