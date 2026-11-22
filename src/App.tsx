@@ -4,6 +4,7 @@ import { loadData } from './lib/supabase';
 import { go, href, useRoute } from './lib/route';
 import AIMenu, { type MenuItem } from './components/AIMenu';
 import Cover from './components/Cover';
+import Entrance from './components/Entrance';
 import Library from './components/Library';
 import Reader from './components/Reader';
 import Threads from './components/Threads';
@@ -50,7 +51,9 @@ export default function App() {
     ...(article ? [{ label: 'הדפסת המאמר', hint: 'עמוד A4', onSelect: () => window.print() }] : []),
   ], [desk, toggleDesk, article]);
 
-  const tab = route.a ? '' : route.view;
+  // Home is the entrance to the magazine. An issue opens by its own address; "הגיליון" goes to the latest one that is out.
+  const latest = data?.issues.find((i) => i.status === 'published') ?? data?.issues[0];
+  const tab = route.a ? '' : route.view === 'cover' ? (route.issue ? 'cover' : 'home') : route.view;
   return (
     <div className={`app ${desk ? 'desk' : ''}`}>
       <header className="bar">
@@ -58,7 +61,7 @@ export default function App() {
           <b>חוט</b><span>מגזין אוצֵר: נכתב באפליקציות, נאצר כאן</span>
         </a>
         <nav aria-label="חלקי המגזין">
-          <Go to={{}} className={tab === 'cover' ? 'on' : ''}>הגיליון</Go>
+          <Go to={latest ? { issue: latest.id } : {}} className={tab === 'cover' ? 'on' : ''}>הגיליון</Go>
           <Go to={{ view: 'library' }} className={tab === 'library' ? 'on' : ''}>כל המאמרים</Go>
           <Go to={{ view: 'threads' }} className={tab === 'threads' ? 'on' : ''}>חוטים</Go>
           <Go to={{ view: 'issues' }} className={tab === 'issues' ? 'on' : ''}>גיליונות</Go>
@@ -84,8 +87,8 @@ export default function App() {
           : route.view === 'library' ? <Library data={data} route={route} desk={desk} />
           : route.view === 'threads' ? <Threads data={data} route={route} desk={desk} onSaved={onSaved} onError={onError} />
           : route.view === 'issues' ? <Issues data={data} desk={desk} onSaved={onSaved} onError={onError} />
-          : issue ? <Cover key={issue.id} data={data} issue={issue} issues={data.issues.filter((i) => desk || i.status === 'published' || i.id === issue.id)} desk={desk} onSaved={onSaved} onError={onError} />
-          : <div className="empty-state page"><h2>עוד לא יצא גיליון</h2><p>בינתיים כל המאמרים פתוחים לקריאה.</p><Go to={{ view: 'library' }} className="btn on">לכל המאמרים</Go></div>
+          : route.issue && issue ? <Cover key={issue.id} data={data} issue={issue} issues={data.issues} desk={desk} onSaved={onSaved} onError={onError} />
+          : <Entrance data={data} />
       )}
 
       {data && threadFrom && <ThreadDialog data={data} from={threadFrom} onClose={() => setThreadFrom(null)} onSaved={onSaved} onError={onError} />}

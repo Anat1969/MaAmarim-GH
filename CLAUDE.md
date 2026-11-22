@@ -27,7 +27,13 @@ Most articles are in no issue, and that is right.
   a proposal); "לעיר", one action for the city (`mag_issues.city`); a LEGEND; its own address (`?issue=<id>`, opens a draft too).
 - The legend (`.legend` in `Cover.tsx`) is made of ways in: each app in the issue links to the app, each topic to the
   collection on that topic, plus the signs (lead, approved / proposed thread, the source link).
-- The cover has a switcher between the issues (`.issue-nav`); readers see published issues, the desk sees drafts too.
+- THE ENTRANCE (Anat, 2026-11-22: "תוודא שיש דף כניסה למגזין... כמו שיש מקרא בתוך מגזין, יש מקרא למגזינים עצמם"): home
+  (`Entrance.tsx`, the brand name returns to it) first presents the magazine, then lists every issue with its number, its
+  question, its topic colour and a way in, and closes with a LEGEND OF THE ISSUES (order, colour = topic of the question,
+  יצא / בהכנה, the topics already asked, the apps that write, each one a way in). The tab "הגיליון" opens the latest issue
+  that is out; an issue lives at `?issue=<id>`.
+- An issue in preparation is shown to everyone, marked "בהכנה" (on the entrance, on the issues screen and in the switcher
+  on the cover, `.issue-nav`), so Anat sees every issue without switching the desk on.
 - Ripeness (`Issues.tsx`, `RIPE`): a question is ripe for an issue at 7 articles from 3 apps; otherwise the screen says what
   is missing. An unripe question is a pointer to what is worth writing next.
 - Issues: 01 התפר המוזהב (published). 02 הדף הלבן, 03 שולחן אחד, 04 משקל הרגע were drafted by Claude on 2026-11-22
@@ -52,7 +58,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 
 ```bash
 npm run build
-npx vite preview --port 4173 & node tests/e2e.mjs     # 61 checks, reads live data, writes nothing
+npx vite preview --port 4173 & node tests/e2e.mjs     # 71 checks, reads live data, writes nothing
 node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```

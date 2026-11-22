@@ -44,7 +44,7 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
         <Go to={{ a: lead.key, from }} className="hero" title={`לקריאה: ${plain(lead.title)}`}>
           {lead.image ? <img src={img(lead.image, 1600)} alt="" /> : <Plate article={lead} topic={leadTopic} />}
           <div className="veil">
-            <span className="mono">גיליון {String(issue.number).padStart(2, '0')} · {monthYear(issue.published_at) || 'טיוטה'}</span>
+            <span className="mono">גיליון {String(issue.number).padStart(2, '0')} · {monthYear(issue.published_at) || 'בהכנה'}</span>
             <h1>{issue.title}</h1>
             <p className="hero-lead">
               <span className="mono">המאמר הראשי</span>
@@ -63,8 +63,8 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
             {order.length > 1 && (
               <span className="issue-nav" role="group" aria-label="מעבר בין גיליונות">
                 {order.map((i) => (
-                  <Go key={i.id} to={{ issue: i.id }} className={i.id === issue.id ? 'on' : ''} title={`${i.title}: ${i.question}${i.status === 'draft' ? ' (טיוטה)' : ''}`}>
-                    {String(i.number).padStart(2, '0')}{i.status === 'draft' ? '*' : ''}
+                  <Go key={i.id} to={{ issue: i.id }} className={`${i.id === issue.id ? 'on' : ''} ${i.status}`} title={`${i.title}: ${i.question}${i.status === 'draft' ? ' (בהכנה)' : ''}`}>
+                    {String(i.number).padStart(2, '0')}
                   </Go>
                 ))}
               </span>
@@ -153,7 +153,7 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
         <footer className="cover-foot">
           <Go to={{ view: 'library' }} className="btn">כל {data.articles.length} המאמרים</Go>
           <Go to={{ view: 'threads' }} className="btn">{approved} חוטים מאושרים, {data.threads.filter((t) => t.status === 'proposed').length} מחכים</Go>
-          <Go to={{ view: 'issues' }} className="btn">כל הגיליונות</Go>
+          <Go to={{}} className="btn">כל הגיליונות</Go>
         </footer>
       </section>
     </main>
