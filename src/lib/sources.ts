@@ -7,6 +7,7 @@ export const SOURCES: Record<SourceId, { label: string; kind: string; url: strin
   ishy: { label: 'מהמרחב הפנימי', kind: 'מקרה', url: 'https://magazinishy.vercel.app', about: 'מקרה אישי, נקרא בשלוש עדשות.' },
   chok: { label: 'חוקי התנהגות', kind: 'חוק', url: 'https://chok-tarbut.vercel.app', about: 'חוק אחד, והתופעות שהוא מסביר בעולמות רחוקים.' },
   amirot: { label: 'אמירות', kind: 'גילוי', url: 'https://amirot-gh.vercel.app', about: 'גילוי שעלה מהצלבת פתגמים מתרבויות רחוקות.' },
+  tzuna: { label: 'מזון, גוף ונפש', kind: 'כתבה', url: 'https://tzuna-gh.vercel.app', about: 'מזון וצומח בשלוש שכבות: ידוע, נאמר, מאמינים.' },
 };
 
 /**
@@ -15,6 +16,7 @@ export const SOURCES: Record<SourceId, { label: string; kind: string; url: strin
  */
 export const FILE_SOURCES: Partial<Record<SourceId, string>> = {
   amirot: 'https://amirot-gh.vercel.app/articles.json',
+  tzuna: 'https://tzuna-gh.vercel.app/articles.json',
 };
 export const SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 export const RADAR = { label: 'רדאר אקטואליה', url: 'https://radar-aktualya.vercel.app' };
@@ -26,5 +28,6 @@ export function originUrl(article: Pick<Article, 'key' | 'source'>): string {
   if (article.source === 'culture') return `${base}/#/article/${id}`;
   if (article.source === 'chok') return `${base}/articles?law=${id}`;
   if (article.source === 'amirot') return `${base}/#/article?a=${id}`;
+  if (article.source === 'tzuna') return `${base}/#/articles?a=${id}`;
   return `${base}/#/a/${id}`;
 }

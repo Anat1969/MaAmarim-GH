@@ -58,7 +58,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 
 ```bash
 npm run build
-npx vite preview --port 4173 & node tests/e2e.mjs     # 71 checks, reads live data, writes nothing
+npx vite preview --port 4173 & node tests/e2e.mjs     # 74 checks, reads live data, writes nothing
 node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```
@@ -106,7 +106,12 @@ body kept in memory for the reader. A file that does not answer leaves the magaz
 (`created_at` is empty: no date in the reader, group "בלי תאריך"). Connected this way: אמירות (9, template of blocks: p / h /
 pull / insight / haiku, `==x==` is a marker). `tests/print.mjs` reads the view only, so file articles are not print-checked.
 LESSON: before saying an app has no articles, OPEN THE APP and read its navigation; creations.json is not the list of articles.
-Still to connect the same way: מזון, גוף ונפש (Tzuna, page `#/articles`), גמד על כתפי ענקים (PrasNovel, "הגילוי הבא").
+Also connected this way (2026-11-22): מזון, גוף ונפש (Tzuna, 9 fixed articles; its file is committed and produced in a
+browser by `scripts/articles.mjs` there, its e2e fails when stale; template: four paragraphs, from / to, quote, numbers,
+insight, haiku, sources; "החודש" is a live page and is not in the file).
+NOT CONNECTED, ON PURPOSE: גמד על כתפי ענקים (PrasNovel). Its own CLAUDE.md says it is a personal tool, "לא לקהל", and that
+no part of it is published to others before the licensing approval; its "הגילוי הבא" articles are marked [הנחה]. The magazine
+is public, so connecting it is Anat's decision, not a build step. Do not connect it without her explicit word.
 No articles page found in רפואה and עולם נעלם (checked in a browser, 2026-11-22). Also not in: TAARUCHA works (short captions), Drive.
 
 RLS: public read, no write policies. Every write goes through the edge function `mag-edit` (`supabase/functions/mag-edit`,

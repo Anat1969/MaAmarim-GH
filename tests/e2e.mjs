@@ -101,6 +101,14 @@ await page.waitForSelector('.r-body .sec');
 ok(await page.locator('.r-body .pull').count() >= 1 && await page.locator('.r-body .insight').count() >= 1, 'an Amirot article opens in its own template: pulled quote and insight');
 ok(/amirot-gh\.vercel\.app\/#\/article\?a=[a-z]+$/.test(await page.locator('.crumbs a.origin').getAttribute('href') ?? ''), 'an Amirot article links to itself in Amirot');
 
+await page.goto(`${BASE}/?view=library&src=tzuna`, { waitUntil: 'networkidle' });
+const tzuna = await page.locator('.card').count();
+ok(tzuna >= 9, `the sixth source, מזון גוף ונפש, is read from the open file its app publishes (${tzuna})`);
+await page.locator('.card').first().click();
+await page.waitForSelector('.r-body .sec');
+ok(await page.locator('.r-body .para').count() >= 4 && await page.locator('.r-body .haiku').count() === 1, 'a Tzuna article opens in its own template: four paragraphs, numbers, insight, haiku');
+ok(/tzuna-gh\.vercel\.app\/#\/articles\?a=[a-z-]+$/.test(await page.locator('.crumbs a.origin').getAttribute('href') ?? ''), 'a Tzuna article links to itself in its app');
+
 await page.goto(`${BASE}/?view=threads`, { waitUntil: 'networkidle' });
 ok(await page.locator('.arc').count() >= 1, 'threads map draws the threads');
 await page.locator('.t-row').nth(1).click();
