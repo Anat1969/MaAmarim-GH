@@ -475,3 +475,16 @@ html.a4 .sec { margin-bottom: 1.1rem; }
   .ent-row .issue-txt b { font-size: 1.35rem; }
   .ent-row .issue-txt i { font-size: 1rem; }
 }
+
+/* ---------- How to complete a question: what to write, where, and the request ready to copy ---------- */
+.complete { background: var(--wash); padding: 0.7rem 0.8rem; display: grid; gap: 0.5rem; }
+.complete h4 { font-family: var(--serif); font-weight: 500; font-size: 1.05rem; }
+.complete ol { display: grid; gap: 0.55rem; list-style: none; counter-reset: c; }
+.complete li { counter-increment: c; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; column-gap: 0.5rem; row-gap: 0.1rem; align-items: start; border: 0 !important; }
+.complete li::before { content: counter(c); grid-row: 1 / span 3; font-family: var(--mono); font-size: 0.8rem; color: var(--grey); padding-top: 0.15rem; }
+.complete li .mono { grid-column: 2; color: var(--ink2) !important; font-size: 0.66rem; }
+.complete li b { grid-column: 2; font-family: var(--serif); font-weight: 500; font-size: 1.02rem; line-height: 1.25; }
+.complete li i { grid-column: 2; font-style: normal; font-size: 0.82rem; color: var(--ink2); line-height: 1.4; }
+.complete li .btn { grid-column: 3; grid-row: 1 / span 3; align-self: center; white-space: nowrap; }
+.cand { grid-template-rows: none !important; align-content: start; }
+@media (max-width: 900px) { .complete li { grid-template-columns: 1.4rem minmax(0, 1fr); } .complete li .btn { grid-column: 2; grid-row: auto; justify-self: start; margin-top: 0.3rem; } }

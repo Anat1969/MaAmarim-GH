@@ -7,6 +7,9 @@ import type { Route } from '../lib/route';
 type Raw = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 const arr = (v: unknown): any[] => (Array.isArray(v) ? v : []); // eslint-disable-line @typescript-eslint/no-explicit-any
 
+/** Sources whose article is a run of blocks: p, h, pull, insight, haiku. */
+const BLOCKS = new Set(['amirot', 'pras', 'refua', 'olam']);
+
 const LENS: Record<string, string> = { biographical: 'עדשה ביוגרפית', tzimtzum: 'עדשת הצמצום', buddhist: 'עדשה בודהיסטית' };
 
 function Sec({ title, tone, children }: { title: string; tone?: 'do' | 'quiet'; children: React.ReactNode }) {
@@ -99,15 +102,15 @@ export default function ArticleBody({ article, raw, back }: { article: Article; 
     );
   }
 
-  if (article.source === 'amirot') {
+  if (BLOCKS.has(article.source)) {
     // The app writes an article as a run of blocks; a heading block opens a new section.
-    const secs: { title: string; blocks: Raw[] }[] = [{ title: 'הגילוי', blocks: [] }];
+    const secs: { title: string; blocks: Raw[] }[] = [{ title: article.source === 'amirot' ? 'הגילוי' : 'הכתבה', blocks: [] }];
     arr(raw.body).forEach((b) => { if (b.h) secs.push({ title: String(b.h), blocks: [] }); else secs[secs.length - 1].blocks.push(b); });
     const mark = (t: unknown) => String(t ?? '').replace(/==(.+?)==/g, '**$1**');
     return (
       <>
         {secs.filter((s) => s.blocks.length).map((s, i) => (
-          <Sec key={i} title={s.title} tone={s.title.startsWith('בעיר') ? 'do' : undefined}>
+          <Sec key={i} title={plain(s.title).replace(/==/g, '')} tone={s.title.startsWith('בעיר') ? 'do' : undefined}>
             {s.blocks.map((b, j) => (
               b.p ? <Para key={j} text={mark(b.p)} lead={j === 0} />
                 : b.pull ? <blockquote key={j} className="pull"><q>{plain(b.pull)}</q><cite>{b.cite}</cite></blockquote>
@@ -230,10 +233,10 @@ export function facts(article: Article, raw: Raw | null): { label: string; value
       { label: 'התמונה', value: raw.credit },
     ].filter((f) => f.value);
   }
-  if (article.source === 'amirot') {
+  if (BLOCKS.has(article.source)) {
     return [
-      { label: 'שלב', value: raw.zone },
-      { label: 'השאלה', value: raw.kicker },
+      { label: article.source === 'pras' ? 'מדור' : 'שלב', value: raw.zone },
+      { label: article.source === 'amirot' ? 'השאלה' : 'סוג', value: raw.kicker !== raw.zone ? raw.kicker : '' },
       { label: 'מקורות', value: arr(raw.notes).length ? String(arr(raw.notes).length) : '' },
       { label: 'התמונה', value: raw.credit },
     ].filter((f) => f.value);

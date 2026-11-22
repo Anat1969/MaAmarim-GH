@@ -31,7 +31,8 @@ const upsert = (table: string, row: unknown) => rest('POST', table, row, 'resolu
 const log = (action: string, payload: unknown, before: unknown) =>
   rest('POST', 'mag_log', { action, payload, before: before ?? null }, 'return=minimal');
 
-const KEY = /^((culture|mahut|ishy):[0-9a-f-]{36}|(chok|amirot|tzuna):[a-z0-9-]{1,60})$/;
+// <source>:<id>. Any source the magazine reads: a new one must not need a redeploy here.
+const KEY = /^[a-z]{2,12}:[a-z0-9-]{1,60}$/;
 const ID = /^[a-z0-9-]{1,60}$/;
 const UUID = /^[0-9a-f-]{36}$/;
 const text = (v: unknown, max: number) => String(v ?? '').trim().slice(0, max);
@@ -59,6 +60,25 @@ const actions: Record<string, (p: P) => Promise<unknown>> = {
       await upsert('mag_article_topics', { article_key: key, topic_id: topic, updated_at: new Date().toISOString() });
     }
     await log('set_topic', p, before);
+    return { ok: true };
+  },
+
+  /** A new question becomes a topic, and the articles that answer it move to it. */
+  async save_topic(p) {
+    const t = (p.topic ?? {}) as P;
+    const id = String(t.id ?? '');
+    const label = text(t.label, 40);
+    const question = text(t.question, 120);
+    const color = String(t.color ?? '');
+    need(ID.test(id) && label && question && /^#[0-9a-fA-F]{6}$/.test(color), 'לנושא חסרים שם, שאלה או צבע');
+    const keys = (Array.isArray(p.keys) ? p.keys : []).map(String).filter((k) => KEY.test(k)).slice(0, 40);
+    const before = { topic: await get(`mag_topics?id=eq.${enc(id)}`), articles: keys.length ? await get(`mag_article_topics?article_key=in.(${keys.map((k) => `"${k}"`).join(',')})`) : [] };
+    const last = await get('mag_topics?select=position&order=position.desc&limit=1');
+    const position = before.topic?.[0]?.position ?? (last?.[0]?.position ?? 0) + 1;
+    await upsert('mag_topics', { id, label, question, color, position });
+    const now = new Date().toISOString();
+    for (const key of keys) await upsert('mag_article_topics', { article_key: key, topic_id: id, updated_at: now });
+    await log('save_topic', p, before);
     return { ok: true };
   },
 
