@@ -7,22 +7,35 @@ export const SOURCES: Record<SourceId, { label: string; kind: string; url: strin
   ishy: { label: 'מהמרחב הפנימי', kind: 'מקרה', url: 'https://magazinishy.vercel.app', about: 'מקרה אישי, נקרא בשלוש עדשות.' },
   chok: { label: 'חוקי התנהגות', kind: 'חוק', url: 'https://chok-tarbut.vercel.app', about: 'חוק אחד, והתופעות שהוא מסביר בעולמות רחוקים.' },
   amirot: { label: 'אמירות', kind: 'גילוי', url: 'https://amirot-gh.vercel.app', about: 'גילוי שעלה מהצלבת פתגמים מתרבויות רחוקות.' },
+  pras: { label: 'גמד על כתפי ענקים', kind: 'כתבה', url: 'https://prasnovel-gh.vercel.app', about: 'רעיונות של זוכי נובל, פריצקר וטיורינג, והגילוי הבא.' },
+  refua: { label: 'רפואה', kind: 'כתבה', url: 'https://refua-gh.vercel.app', about: 'גוף, מחלה ובריאות: מה הגוף מלמד.' },
+  olam: { label: 'עולם נעלם', kind: 'כתבה', url: 'https://olam-gh.vercel.app', about: 'גילויים, קשרים ודמויות לאורך הזמן.' },
   tzuna: { label: 'מזון, גוף ונפש', kind: 'כתבה', url: 'https://tzuna-gh.vercel.app', about: 'מזון וצומח בשלוש שכבות: ידוע, נאמר, מאמינים.' },
 };
 
 /**
- * Sources that are not a table: the app publishes its articles as an open file (articles.json), written on every
- * build from its own data. The magazine reads the file and keeps no copy. To add one: its app writes the same file.
+ * Sources that are not a table. Two kinds of open file, both written by the app from its own data; the magazine keeps no copy.
+ * - `articles`: articles.json (id, title, sub, image, body, url). To add one: its app writes the same file.
+ * - `creations`: the creations.json every app publishes by the shared standard (AppOfApp-GH/docs/creations-standard.md).
+ *   Each topic there is one A4 article ("כל נושא הוא כתבה"), so an app with creations needs no change to join: one line here.
+ *   `page` is the hash of its creations page; `?ar-open=<topic>` before it opens the article.
  */
-export const FILE_SOURCES: Partial<Record<SourceId, string>> = {
-  amirot: 'https://amirot-gh.vercel.app/articles.json',
-  tzuna: 'https://tzuna-gh.vercel.app/articles.json',
+export const FILE_SOURCES: Partial<Record<SourceId, { url: string; kind: 'articles' | 'creations'; page?: string }>> = {
+  amirot: { url: 'https://amirot-gh.vercel.app/articles.json', kind: 'articles' },
+  tzuna: { url: 'https://tzuna-gh.vercel.app/articles.json', kind: 'articles' },
+  pras: { url: 'https://prasnovel-gh.vercel.app/articles.json', kind: 'articles' },
+  refua: { url: 'https://refua-gh.vercel.app/creations.json', kind: 'creations', page: '#v=creations' },
+  olam: { url: 'https://olam-gh.vercel.app/creations.json', kind: 'creations', page: '#/creations' },
 };
+/** The address of each file article inside its own app, as the file gives it. */
+export const fileOrigin = new Map<string, string>();
 export const SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 export const RADAR = { label: 'רדאר אקטואליה', url: 'https://radar-aktualya.vercel.app' };
 
 /** The address of this one article inside the app that wrote it. Each app has its own shape of address. */
 export function originUrl(article: Pick<Article, 'key' | 'source'>): string {
+  const own = fileOrigin.get(article.key);
+  if (own) return own;
   const id = encodeURIComponent(article.key.slice(article.key.indexOf(':') + 1));
   const base = SOURCES[article.source].url.replace(/\/$/, '');
   if (article.source === 'culture') return `${base}/#/article/${id}`;

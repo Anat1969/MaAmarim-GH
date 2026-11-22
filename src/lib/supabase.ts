@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { FILE_SOURCES, SOURCES } from './sources';
+import { FILE_SOURCES, SOURCES, fileOrigin } from './sources';
 import type { Article, Data, SourceId, Issue, IssueItem, Thread, Topic, Unlinked, World } from './types';
 
 // cultura-GH: the shared project of Anat's apps. The magazine owns only the mag_ tables.
@@ -23,21 +23,49 @@ async function all<T>(q: PromiseLike<{ data: unknown; error: { message: string }
 /** The bodies of articles that came from a file, kept in memory so the reader opens them without a second request. */
 const fileRaw = new Map<string, Record<string, unknown>>();
 
-type Feed = { articles?: { id: string; zone?: string; kicker?: string; title: string; sub?: string; image?: string | null; body?: (Record<string, unknown> | string)[] }[] };
+type Block = Record<string, unknown>;
+type FeedArticle = { id: string; url?: string; zone?: string; kicker?: string; title: string; sub?: string; image?: string | null; credit?: string | null; body?: (Block | string)[]; notes?: string[]; quote?: { q?: string } | null };
+type Creation = { id: string; style: string; title?: string; text?: string; quote?: string; who?: string; cite?: string; lines?: string[]; from?: string; to?: string; fromLabel?: string; toLabel?: string; body?: string[]; image?: string; png?: string; credit?: string; kicker?: string };
+type CreationsFile = { app?: { url?: string }; topics?: { id: string; zone?: string; title: string; sub?: string; creations: Creation[] }[] };
+
+/** A creations topic read as one article: its creations become the blocks of the text, in the order the app set them. */
+function fromCreations(file: CreationsFile, page: string): FeedArticle[] {
+  const base = (file.app?.url ?? '').replace(/\/$/, '');
+  const abs = (p?: string) => (p ? (/^https?:/.test(p) ? p : `${base}/${p}`) : null);
+  return (file.topics ?? []).map((t) => {
+    const body: Block[] = [];
+    for (const c of t.creations) {
+      if (c.style === 'quote') body.push({ pull: c.quote ?? '', cite: [c.who, c.cite].filter(Boolean).join(' · ') });
+      else if (c.style === 'haiku') body.push({ haiku: c.lines ?? [], note: c.text ?? '' });
+      else if (c.style === 'insight') body.push({ insight: `==${c.title ?? ''}== ${c.text ?? ''}`.trim() });
+      else if (c.style === 'fromto') body.push({ h: c.title ?? 'ממה למה' }, { p: `**${c.fromLabel ?? 'מ'}.** ${c.from ?? ''}` }, { p: `**${c.toLabel ?? 'אל'}.** ${c.to ?? ''}` }, ...(c.text ? [{ p: c.text }] : []));
+      else {
+        if (c.title && c.title !== t.title) body.push({ h: c.title });
+        if (c.text && c.text !== t.sub) body.push({ p: c.text });
+        (c.body ?? []).forEach((x) => body.push({ p: x }));
+      }
+    }
+    const photo = t.creations.find((c) => c.image);
+    const notes = [...new Set(t.creations.map((c) => c.kicker ?? '').filter((k) => k.startsWith('מקור')).map((k) => k.replace(/^מקור(ות)?:\s*/, '')))];
+    return { id: t.id, url: `${base}/?ar-open=${encodeURIComponent(t.id)}${page}`, zone: t.zone, kicker: t.zone, title: t.title, sub: t.sub, image: abs(photo?.image ?? t.creations.find((c) => c.png)?.png), credit: photo?.credit ?? null, body, notes };
+  });
+}
 
 /** One file source. A source that does not answer leaves the magazine as it is: its articles simply wait. */
-async function loadFile(source: SourceId, url: string): Promise<Omit<Article, 'topic_id'>[]> {
+async function loadFile(source: SourceId, cfg: { url: string; kind: 'articles' | 'creations'; page?: string }): Promise<Omit<Article, 'topic_id'>[]> {
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    const res = await fetch(cfg.url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) return [];
-    const feed = (await res.json()) as Feed;
-    return (feed.articles ?? []).map((a) => {
+    const file = await res.json();
+    const list: FeedArticle[] = cfg.kind === 'creations' ? fromCreations(file as CreationsFile, cfg.page ?? '') : ((file as { articles?: FeedArticle[] }).articles ?? []);
+    return list.map((a) => {
       const key = `${source}:${a.id}`;
       fileRaw.set(key, a as unknown as Record<string, unknown>);
-      // The quote on the cover: a block the app pulled out of the text (Amirot), or the article's own quote (Tzuna).
+      if (a.url) fileOrigin.set(key, a.url);
+      // The quote on the cover: a block the app pulled out of the text, or the article's own quote (Tzuna).
       const pull = Array.isArray(a.body) ? (a.body.find((b) => typeof b === 'object' && b && 'pull' in b) as { pull?: string } | undefined) : undefined;
-      const own = (a as { quote?: { q?: string } | null }).quote?.q?.replace(/^"|"$/g, '');
-      return { key, source, title: a.title, kicker: a.kicker ?? null, lede: a.sub ?? null, quote: pull?.pull ?? own ?? null, image: a.image ?? null, image2: null, hint: a.id, created_at: '' };
+      const own = a.quote?.q?.replace(/^"|"$/g, '');
+      return { key, source, title: a.title, kicker: a.kicker ?? null, lede: a.sub ?? null, quote: pull?.pull || own || null, image: a.image ?? null, image2: null, hint: a.id, created_at: '' };
     });
   } catch {
     return [];
@@ -45,7 +73,7 @@ async function loadFile(source: SourceId, url: string): Promise<Omit<Article, 't
 }
 
 export async function loadData(): Promise<Data> {
-  const files = Object.entries(FILE_SOURCES) as [SourceId, string][];
+  const files = Object.entries(FILE_SOURCES) as [SourceId, NonNullable<(typeof FILE_SOURCES)[SourceId]>][];
   const [articles, topics, issues, items, threads, fromFiles, overrides, hints] = await Promise.all([
     all<Article>(supabase.from(VIEW).select(LIST).order('created_at', { ascending: false })),
     all<Topic>(supabase.from('mag_topics').select('*').order('position')),

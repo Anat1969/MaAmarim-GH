@@ -1,4 +1,7 @@
-import type { Data, Topic } from '../lib/types';
+import { useState } from 'react';
+import type { Article, Data, SourceId, Topic } from '../lib/types';
+import { SOURCES, SOURCE_IDS } from '../lib/sources';
+import { BUILD_IDEAS, NEW_QUESTIONS, WRITE_IDEAS } from '../data/ripen';
 import { edit } from '../lib/supabase';
 import { go } from '../lib/route';
 import { monthYear, plain } from '../lib/text';
@@ -20,18 +23,98 @@ function candidates(data: Data): { topic: Topic; keys: string[]; threads: number
     const threaded = [...new Set(ts.flatMap((t) => [t.a_key, t.b_key]).filter((k) => data.byKey.has(k)))].sort((a, b) => Number(mine(b)) - Number(mine(a)));
     const keys = [...new Set([...threaded, ...own.map((a) => a.key)])];
     const apps = new Set(own.map((a) => a.source)).size;
-    const need = [
-      apps < RIPE.apps ? (RIPE.apps - apps === 1 ? 'עוד אפליקציה אחת שכותבת על זה' : `עוד ${RIPE.apps - apps} אפליקציות שכותבות על זה`) : '',
-      own.length < RIPE.articles ? (RIPE.articles - own.length === 1 ? 'עוד מאמר אחד' : `עוד ${RIPE.articles - own.length} מאמרים`) : '',
-    ].filter(Boolean).join(', ');
+    const need = missing(own);
     return { topic, keys, threads: ts.length, total: own.length, apps, missing: need };
   }).sort((a, b) => Number(!!a.missing) - Number(!!b.missing) || b.threads - a.threads || b.total - a.total).slice(0, 3);
+}
+
+/** What an article list is missing to carry an issue. Empty when it is ripe. */
+function missing(list: Article[]): string {
+  const apps = new Set(list.map((a) => a.source)).size;
+  return [
+    apps < RIPE.apps ? (RIPE.apps - apps === 1 ? 'עוד אפליקציה אחת שכותבת על זה' : `עוד ${RIPE.apps - apps} אפליקציות שכותבות על זה`) : '',
+    list.length < RIPE.articles ? (RIPE.articles - list.length === 1 ? 'עוד מאמר אחד' : `עוד ${RIPE.articles - list.length} מאמרים`) : '',
+  ].filter(Boolean).join(', ');
+}
+
+/** The request to paste into the development chat of an app, so that it writes the article the question needs. */
+const prompt = (app: SourceId, question: string, label: string, title?: string) =>
+  `באפליקציה "${SOURCES[app].label}" (${SOURCES[app].url}): כתוב כתבה חדשה${title ? ` בשם "${title}"` : ''}, שעונה על השאלה "${question}" (הנושא במגזין "חוט": ${label}).\nשמור על המבנה, האורך והסגנון של הכתבות שכבר יש באפליקציה, עם מקור לכל עובדה.\nאחרי הפריסה הכתבה צריכה להופיע לבד במגזין "חוט" (https://maamarim-gh.vercel.app), תחת הנושא "${label}".`;
+
+function Copy({ text, children }: { text: string; children: React.ReactNode }) {
+  const [done, setDone] = useState(false);
+  return (
+    <button className={`btn small ${done ? 'on' : ''}`} title={text}
+      onClick={async () => {
+        setDone(true); setTimeout(() => setDone(false), 1800);
+        try { await navigator.clipboard.writeText(text); } catch {
+          // A browser that blocks the clipboard: copy through a hidden field instead.
+          const ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } finally { ta.remove(); }
+        }
+      }}>
+      {done ? 'הועתק' : children}
+    </button>
+  );
+}
+
+/**
+ * How to complete a question (Anat, 2026-11-22): which article to write and in which app, with the request ready to copy,
+ * and which app to build when nobody writes on it. Cheapest lever first.
+ */
+function Complete({ id, label, question, list }: { id: string; label: string; question: string; list: Article[] }) {
+  const writing = new Set(list.map((a) => a.source));
+  const ideas = (WRITE_IDEAS[id] ?? []).filter((i) => !writing.has(i.app));
+  const others = SOURCE_IDS.filter((s) => !writing.has(s) && !ideas.some((i) => i.app === s)).slice(0, 3);
+  const build = BUILD_IDEAS[id];
+  return (
+    <div className="complete">
+      <h4>איך משלימים</h4>
+      <ol>
+        {ideas.map((i) => (
+          <li key={i.app + i.title}>
+            <span className="mono">כתבה לכתוב ב{SOURCES[i.app].label}</span>
+            <b>{i.title}</b><i>{i.why}</i>
+            <Copy text={prompt(i.app, question, label, i.title)}>העתקת הבקשה</Copy>
+          </li>
+        ))}
+        {others.map((s) => (
+          <li key={s}>
+            <span className="mono">אפליקציה שעוד לא כתבה על זה</span>
+            <b>{SOURCES[s].label}</b><i>{SOURCES[s].about}</i>
+            <Copy text={prompt(s, question, label)}>העתקת הבקשה</Copy>
+          </li>
+        ))}
+        {build && (
+          <li>
+            <span className="mono">אפליקציה לבנות</span>
+            <b>{build.name}</b><i>{build.what}</i>
+            <Copy text={`אני בונה אפליקציה חדשה: "${build.name}".\n${build.what}\nהיא צריכה לפרסם את הכתבות שלה כקובץ פתוח (articles.json), כדי שהן יופיעו במגזין "חוט" ויענו על השאלה "${question}".`}>העתקת הבקשה</Copy>
+          </li>
+        )}
+      </ol>
+    </div>
+  );
 }
 
 export default function Issues({ data, desk, onSaved, onError }: Props) {
   // An issue in preparation is shown to everyone, marked as such (the entrance does the same).
   const issues = data.issues;
   const next = candidates(data);
+
+  // New questions: only those that are not a topic yet, with the articles of theirs that the collection really holds.
+  const fresh = NEW_QUESTIONS.filter((q) => !data.topics.some((t) => t.id === q.id)).map((q) => {
+    const list = q.keys.map((k) => data.byKey.get(k)).filter(Boolean) as Article[];
+    return { ...q, list, missing: missing(list) };
+  });
+  const openQuestion = async (q: (typeof fresh)[number]) => {
+    try {
+      await edit('save_topic', { topic: { id: q.id, label: q.label, question: q.question, color: q.color }, keys: q.list.map((a) => a.key) });
+      onSaved('השאלה נפתחה כנושא חדש');
+    } catch (e) { onError((e as Error).message); }
+  };
 
   const open = async (c: ReturnType<typeof candidates>[number]) => {
     try {
@@ -76,6 +159,7 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
               <h3>{c.topic.question}</h3>
               <p className="count"><b>{c.total}</b> מאמרים מ-<b>{c.apps}</b> אפליקציות, <b>{c.threads}</b> חוטים</p>
               <p className={`ripe ${c.missing ? 'no' : 'yes'}`}>{c.missing ? `עוד לא בשל. חסר: ${c.missing}.` : 'בשל לגיליון.'}</p>
+              {c.missing && <Complete id={c.topic.id} label={c.topic.label} question={c.topic.question} list={data.articles.filter((x) => x.topic_id === c.topic.id)} />}
               <ul>{c.keys.slice(0, 7).map((k) => <li key={k}><Go to={{ a: k }}>{plain(data.byKey.get(k)!.title).split(':')[0]}<SourceTag source={data.byKey.get(k)!.source} article={data.byKey.get(k)!} /></Go></li>)}</ul>
               <div className="cand-foot">
                 <Go to={{ view: 'library', topic: c.topic.id }} className="btn">לכל מאמרי הנושא</Go>
@@ -83,9 +167,31 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
               </div>
             </div>
           ))}
-          {!next.length && <p className="small">כל שאלה שיש באוסף כבר קיבלה גיליון. שאלה חדשה נולדת כשמוסיפים נושא.</p>}
+          {!next.length && <p className="small">כל שאלה שיש באוסף כבר קיבלה גיליון. השאלות הבאות מחכות למטה.</p>}
         </div>
       </section>
+      {fresh.length > 0 && (
+        <section>
+          <h2>אחרי שבע השאלות: שאלות חדשות שהאוסף כבר מתחיל לענות עליהן</h2>
+          <p className="small">הצעה של Claude, לא החלטה. שאלה חדשה נפתחת כנושא, והמאמרים שעונים עליה עוברים אליה. מה שחסר לה כתוב לידה, עם בקשה מוכנה להעתקה.</p>
+          <div className="cands">
+            {fresh.map((q) => (
+              <div key={q.id} className="cand" style={{ '--c': q.color } as React.CSSProperties}>
+                <p className="mono">{q.label} · שאלה חדשה</p>
+                <h3>{q.question}</h3>
+                <p className="count">{q.why}</p>
+                <p className="count"><b>{q.list.length}</b> מאמרים מ-<b>{new Set(q.list.map((a) => a.source)).size}</b> אפליקציות כבר באוסף</p>
+                <p className={`ripe ${q.missing ? 'no' : 'yes'}`}>{q.missing ? `עוד לא בשלה. חסר: ${q.missing}.` : 'בשלה לגיליון.'}</p>
+                <ul>{q.list.map((a) => <li key={a.key}><Go to={{ a: a.key }}>{plain(a.title).split(':')[0]}<SourceTag source={a.source} article={a} /></Go></li>)}</ul>
+                <Complete id={q.id} label={q.label} question={q.question} list={q.list} />
+                <div className="cand-foot">
+                  {desk && <button className="btn on" onClick={() => openQuestion(q)}>פתיחת השאלה כנושא חדש</button>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }

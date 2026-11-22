@@ -36,6 +36,13 @@ Most articles are in no issue, and that is right.
   on the cover, `.issue-nav`), so Anat sees every issue without switching the desk on.
 - Ripeness (`Issues.tsx`, `RIPE`): a question is ripe for an issue at 7 articles from 3 apps; otherwise the screen says what
   is missing. An unripe question is a pointer to what is worth writing next.
+- HOW TO COMPLETE A QUESTION (Anat, 2026-11-22: "חשוב גם שתיתן לי את הפתרון. איך אני משלימה את מה שחסר. איזה אפליקציה
+  לבנות, איזה מאמר לכתוב"): the ripeness screen never stops at the diagnosis. `Complete` in `Issues.tsx` lists, cheapest
+  first: an article to write in an app that already writes (`WRITE_IDEAS` in `src/data/ripen.ts`), apps that have not
+  written on the question yet, and an app to build (`BUILD_IDEAS`), each with the request READY TO COPY for the development
+  chat of that app. After the seven topic questions, `NEW_QUESTIONS` proposes the next ones from articles already in the
+  collection; on the desk one button opens a question as a new topic and moves its articles (`save_topic` in `mag-edit`).
+  All of it is Claude's proposal, marked as such. When a question gets an issue or a topic, update `ripen.ts`.
 - Issues: 01 התפר המוזהב (published). 02 הדף הלבן, 03 שולחן אחד, 04 משקל הרגע were drafted by Claude on 2026-11-22
   (articles, notes, claim, city action, one proposed thread): DRAFTS until Anat approves them on the desk.
 
@@ -58,7 +65,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 
 ```bash
 npm run build
-npx vite preview --port 4173 & node tests/e2e.mjs     # 74 checks, reads live data, writes nothing
+npx vite preview --port 4173 & node tests/e2e.mjs     # 85 checks, reads live data, writes nothing
 node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```
@@ -109,10 +116,17 @@ LESSON: before saying an app has no articles, OPEN THE APP and read its navigati
 Also connected this way (2026-11-22): מזון, גוף ונפש (Tzuna, 9 fixed articles; its file is committed and produced in a
 browser by `scripts/articles.mjs` there, its e2e fails when stale; template: four paragraphs, from / to, quote, numbers,
 insight, haiku, sources; "החודש" is a live page and is not in the file).
-NOT CONNECTED, ON PURPOSE: גמד על כתפי ענקים (PrasNovel). Its own CLAUDE.md says it is a personal tool, "לא לקהל", and that
-no part of it is published to others before the licensing approval; its "הגילוי הבא" articles are marked [הנחה]. The magazine
-is public, so connecting it is Anat's decision, not a build step. Do not connect it without her explicit word.
-No articles page found in רפואה and עולם נעלם (checked in a browser, 2026-11-22). Also not in: TAARUCHA works (short captions), Drive.
+THREE MORE SOURCES AND A SECOND LESSON (Anat, 2026-11-22: "לא אישי! לחבר את גמד על כתפי ענקים. באפליקציה רפואה הכתבות
+תחת שם שנקרא יצירות"): גמד על כתפי ענקים (`pras`, 21: six "הגילוי הבא" and fifteen evolution threads of Pritzker and Turing,
+from its own articles.json, the [הערכה] / [הנחה] labels travel with the text); רפואה (`refua`, 7) and עולם נעלם (`olam`, 8) are
+read straight from the `creations.json` they already publish, with NO change in those apps: by the shared creations standard
+every topic there is one A4 article. `FILE_SOURCES` now has a `kind`: `articles` or `creations` (+ `page`, the hash of the
+creations page; `?ar-open=<topic>` before it opens that article, added to the shared `creations.js` in AppOfApp-GH).
+ANY APP WITH A CREATIONS PAGE IS A SOURCE: joining is one line in `FILE_SOURCES`, one entry in `SOURCES`, and topic hints.
+Block sources (`BLOCKS` in `ArticleBody.tsx`: amirot, pras, refua, olam) share one template of blocks.
+SECOND LESSON: articles are not always under a tab called "כתבות". Look for "יצירות" too, and read what the page says.
+Every file article got a topic through `mag_topic_map` (hint = article id; Claude's assignment, the editor can change each).
+`mag-edit` accepts any `<source>:<id>` key, so a new source needs no redeploy there.
 
 RLS: public read, no write policies. Every write goes through the edge function `mag-edit` (`supabase/functions/mag-edit`,
 service role, verify_jwt off). Actions: check, set_topic, save_issue, set_item, remove_item, save_thread, thread_status.

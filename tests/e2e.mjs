@@ -109,6 +109,21 @@ await page.waitForSelector('.r-body .sec');
 ok(await page.locator('.r-body .para').count() >= 4 && await page.locator('.r-body .haiku').count() === 1, 'a Tzuna article opens in its own template: four paragraphs, numbers, insight, haiku');
 ok(/tzuna-gh\.vercel\.app\/#\/articles\?a=[a-z-]+$/.test(await page.locator('.crumbs a.origin').getAttribute('href') ?? ''), 'a Tzuna article links to itself in its app');
 
+for (const [src, min, host] of [['pras', 21, 'prasnovel-gh'], ['refua', 7, 'refua-gh'], ['olam', 8, 'olam-gh']]) {
+  await page.goto(`${BASE}/?view=library&src=${src}`, { waitUntil: 'networkidle' });
+  const n = await page.locator('.card').count();
+  ok(n >= min, `source ${src} is read from the open file its app publishes (${n})`);
+  ok(await page.locator('.card .topic-dot.none').count() === 0, `every ${src} article has a topic`);
+  await page.locator('.card').first().click();
+  await page.waitForSelector('.r-body .sec');
+  ok((await page.locator('.crumbs a.origin').getAttribute('href') ?? '').includes(`${host}.vercel.app/`) && await page.locator('.r-body .para, .r-body .pull, .r-body .insight').count() >= 2, `a ${src} article opens as blocks and links to itself in its app`);
+}
+await page.goto(`${BASE}/?view=issues`, { waitUntil: 'networkidle' });
+ok(await page.locator('.complete').count() >= 1 && await page.locator('.complete li .btn').count() >= 3, 'a question shows how to complete it: what to write, where, and a request ready to copy');
+await page.context().grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => undefined);
+await page.locator('.complete li .btn').first().click();
+ok((await page.locator('.complete li .btn').first().innerText()).includes('הועתק'), 'the request is copied in one click');
+
 await page.goto(`${BASE}/?view=threads`, { waitUntil: 'networkidle' });
 ok(await page.locator('.arc').count() >= 1, 'threads map draws the threads');
 await page.locator('.t-row').nth(1).click();
