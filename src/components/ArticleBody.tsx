@@ -99,6 +99,33 @@ export default function ArticleBody({ article, raw, back }: { article: Article; 
     );
   }
 
+  if (article.source === 'amirot') {
+    // The app writes an article as a run of blocks; a heading block opens a new section.
+    const secs: { title: string; blocks: Raw[] }[] = [{ title: 'הגילוי', blocks: [] }];
+    arr(raw.body).forEach((b) => { if (b.h) secs.push({ title: String(b.h), blocks: [] }); else secs[secs.length - 1].blocks.push(b); });
+    const mark = (t: unknown) => String(t ?? '').replace(/==(.+?)==/g, '**$1**');
+    return (
+      <>
+        {secs.filter((s) => s.blocks.length).map((s, i) => (
+          <Sec key={i} title={s.title} tone={s.title.startsWith('בעיר') ? 'do' : undefined}>
+            {s.blocks.map((b, j) => (
+              b.p ? <Para key={j} text={mark(b.p)} lead={j === 0} />
+                : b.pull ? <blockquote key={j} className="pull"><q>{plain(b.pull)}</q><cite>{b.cite}</cite></blockquote>
+                : b.insight ? <p key={j} className="insight">{marked(mark(b.insight))}</p>
+                : b.haiku ? <div key={j} className="haiku">{arr(b.haiku).map((l, k) => <span key={k}>{l}</span>)}{b.note && <small>{b.note}</small>}</div>
+                : null
+            ))}
+          </Sec>
+        ))}
+        {arr(raw.notes).length > 0 && (
+          <Sec title="מקורות" tone="quiet">
+            <ol className="steps">{arr(raw.notes).map((n, i) => <li key={i}>{String(n)}</li>)}</ol>
+          </Sec>
+        )}
+      </>
+    );
+  }
+
   const syn = (raw.synthesis ?? {}) as Raw;
   const turn = (raw.turn ?? {}) as Raw;
   return (
@@ -160,6 +187,14 @@ export function facts(article: Article, raw: Raw | null): { label: string; value
       { label: 'תחום', value: arr(law.domain).join(', ') },
       { label: 'מקור', value: law.source },
       { label: 'חוזק הראיות', value: law.evidence_strength ? `${law.evidence_strength} מתוך 5` : '' },
+    ].filter((f) => f.value);
+  }
+  if (article.source === 'amirot') {
+    return [
+      { label: 'שלב', value: raw.zone },
+      { label: 'השאלה', value: raw.kicker },
+      { label: 'מקורות', value: arr(raw.notes).length ? String(arr(raw.notes).length) : '' },
+      { label: 'התמונה', value: raw.credit },
     ].filter((f) => f.value);
   }
   if (article.source === 'mahut') {

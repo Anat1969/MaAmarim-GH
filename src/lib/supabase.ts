@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { SOURCES } from './sources';
-import type { Article, Data, Issue, IssueItem, Thread, Topic, Unlinked, World } from './types';
+import { FILE_SOURCES, SOURCES } from './sources';
+import type { Article, Data, SourceId, Issue, IssueItem, Thread, Topic, Unlinked, World } from './types';
 
 // cultura-GH: the shared project of Anat's apps. The magazine owns only the mag_ tables.
 export const SUPABASE_URL = 'https://ktqmwpbzcnzkhjskqisy.supabase.co';
@@ -20,21 +20,52 @@ async function all<T>(q: PromiseLike<{ data: unknown; error: { message: string }
   return (data ?? []) as T[];
 }
 
+/** The bodies of articles that came from a file, kept in memory so the reader opens them without a second request. */
+const fileRaw = new Map<string, Record<string, unknown>>();
+
+type Feed = { articles?: { id: string; zone?: string; kicker?: string; title: string; sub?: string; image?: string | null; body?: Record<string, unknown>[] }[] };
+
+/** One file source. A source that does not answer leaves the magazine as it is: its articles simply wait. */
+async function loadFile(source: SourceId, url: string): Promise<Omit<Article, 'topic_id'>[]> {
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) return [];
+    const feed = (await res.json()) as Feed;
+    return (feed.articles ?? []).map((a) => {
+      const key = `${source}:${a.id}`;
+      fileRaw.set(key, a as unknown as Record<string, unknown>);
+      const pull = (a.body ?? []).find((b) => 'pull' in b) as { pull?: string } | undefined;
+      return { key, source, title: a.title, kicker: a.kicker ?? null, lede: a.sub ?? null, quote: pull?.pull ?? null, image: a.image ?? null, image2: null, hint: a.id, created_at: '' };
+    });
+  } catch {
+    return [];
+  }
+}
+
 export async function loadData(): Promise<Data> {
-  const [articles, topics, issues, items, threads] = await Promise.all([
+  const files = Object.entries(FILE_SOURCES) as [SourceId, string][];
+  const [articles, topics, issues, items, threads, fromFiles, overrides, hints] = await Promise.all([
     all<Article>(supabase.from(VIEW).select(LIST).order('created_at', { ascending: false })),
     all<Topic>(supabase.from('mag_topics').select('*').order('position')),
     all<Issue>(supabase.from('mag_issues').select('*').order('number', { ascending: false })),
     all<IssueItem>(supabase.from('mag_issue_items').select('*').order('position')),
     all<Thread>(supabase.from('mag_threads').select('*').order('created_at')),
+    Promise.all(files.map(([s, u]) => loadFile(s, u))),
+    all<{ article_key: string; topic_id: string }>(supabase.from('mag_article_topics').select('article_key,topic_id')),
+    all<{ source: string; hint: string; topic_id: string }>(supabase.from('mag_topic_map').select('source,hint,topic_id').in('source', files.map(([s]) => s))),
   ]);
+  // The view gives a table article its topic. A file article gets it here, by the same rule: the editor's choice first, then the hint.
+  const chosen = new Map(overrides.map((o) => [o.article_key, o.topic_id]));
+  const hinted = new Map(hints.map((h) => [`${h.source}:${h.hint}`, h.topic_id]));
+  const extra: Article[] = fromFiles.flat().map((a) => ({ ...a, topic_id: chosen.get(a.key) ?? hinted.get(a.key) ?? null }));
   // A source the code does not know yet must not break the page: its articles wait until it has a template.
-  const known = articles.filter((a) => a.source in SOURCES);
+  const known = [...articles.filter((a) => a.source in SOURCES), ...extra];
   return { articles: known, byKey: new Map(known.map((a) => [a.key, a])), topics, issues, items, threads };
 }
 
 /** The body of one article, in the shape its own app keeps it. */
 export async function loadRaw(key: string): Promise<Record<string, unknown> | null> {
+  if (fileRaw.has(key)) return fileRaw.get(key)!;
   const { data, error } = await supabase.from(VIEW).select('raw').eq('key', key).maybeSingle();
   if (error) throw new Error(error.message);
   return (data?.raw as Record<string, unknown>) ?? null;

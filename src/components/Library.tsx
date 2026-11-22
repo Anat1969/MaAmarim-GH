@@ -27,7 +27,9 @@ export function grouped(data: Data, r: Pick<Route, 'topic' | 'src' | 'q' | 'grou
   if (r.group === 'date') {
     const m = new Map<string, Article[]>();
     list.forEach((a) => { const k = a.created_at.slice(0, 7); m.set(k, [...(m.get(k) ?? []), a]); });
-    return [...m.entries()].sort((a, b) => b[0].localeCompare(a[0])).map(([k, l]) => ({ id: k, title: monthYear(`${k}-15`), sub: 'לפי החודש שבו נכתבו', list: l }));
+    return [...m.entries()].sort((a, b) => b[0].localeCompare(a[0])).map(([k, l]) => (k
+      ? { id: k, title: monthYear(`${k}-15`), sub: 'לפי החודש שבו נכתבו', list: l }
+      : { id: 'undated', title: 'בלי תאריך', sub: 'האפליקציה שכתבה אותם לא שומרת תאריך לכתבה', list: l }));
   }
   const out: GroupOut[] = data.topics.map((t) => ({ id: t.id, title: t.label, sub: t.question, color: t.color, list: list.filter((a) => a.topic_id === t.id) }));
   const none = list.filter((a) => !a.topic_id || !data.topics.some((t) => t.id === a.topic_id));
@@ -50,7 +52,8 @@ function Watch() {
   useEffect(() => { loadUnlinked().then(setList).catch(() => setList(null)); }, []);
   if (!list) return null;
   const fresh = list.filter((u) => u.status === 'new');
-  const pending = list.filter((u) => u.status === 'pending');
+  // a pending source that has since been connected through its file is no longer waiting
+  const pending = list.filter((u) => u.status === 'pending' && !(u.name in SOURCES));
   return (
     <section className={`watch ${fresh.length ? 'alert' : ''}`} aria-label="מקורות שעוד לא מחוברים">
       <h2>{fresh.length ? `${fresh.length === 1 ? 'מקור חדש אחד' : `${fresh.length} מקורות חדשים`} עוד לא במגזין` : 'כל מקור כתיבה שנמצא במאגר מחובר למגזין'}</h2>
