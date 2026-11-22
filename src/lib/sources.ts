@@ -10,6 +10,7 @@ export const SOURCES: Record<SourceId, { label: string; kind: string; url: strin
   pras: { label: 'גמד על כתפי ענקים', kind: 'כתבה', url: 'https://prasnovel-gh.vercel.app', about: 'רעיונות של זוכי נובל, פריצקר וטיורינג, והגילוי הבא.' },
   refua: { label: 'רפואה', kind: 'כתבה', url: 'https://refua-gh.vercel.app', about: 'גוף, מחלה ובריאות: מה הגוף מלמד.' },
   olam: { label: 'עולם נעלם', kind: 'כתבה', url: 'https://olam-gh.vercel.app', about: 'גילויים, קשרים ודמויות לאורך הזמן.' },
+  maslul: { label: 'מסלול', kind: 'קולקציה', url: 'https://meatsevetofna-gh.vercel.app', about: 'קולקציית אופנה מתוך השראה: תובנה אחת בשלוש חלופות.' },
   tzuna: { label: 'מזון, גוף ונפש', kind: 'כתבה', url: 'https://tzuna-gh.vercel.app', about: 'מזון וצומח בשלוש שכבות: ידוע, נאמר, מאמינים.' },
 };
 
@@ -26,6 +27,8 @@ export const FILE_SOURCES: Partial<Record<SourceId, { url: string; kind: 'articl
   pras: { url: 'https://prasnovel-gh.vercel.app/articles.json', kind: 'articles' },
   refua: { url: 'https://refua-gh.vercel.app/creations.json', kind: 'creations', page: '#v=creations' },
   olam: { url: 'https://olam-gh.vercel.app/creations.json', kind: 'creations', page: '#/creations' },
+  // Live from the database (edge function mo-articles), so a new collection arrives with no build and no deploy.
+  maslul: { url: 'https://ktqmwpbzcnzkhjskqisy.supabase.co/functions/v1/mo-articles', kind: 'articles' },
 };
 /** The address of each file article inside its own app, as the file gives it. */
 export const fileOrigin = new Map<string, string>();

@@ -8,7 +8,7 @@ type Raw = Record<string, any>; // eslint-disable-line @typescript-eslint/no-exp
 const arr = (v: unknown): any[] => (Array.isArray(v) ? v : []); // eslint-disable-line @typescript-eslint/no-explicit-any
 
 /** Sources whose article is a run of blocks: p, h, pull, insight, haiku. */
-const BLOCKS = new Set(['amirot', 'pras', 'refua', 'olam']);
+const BLOCKS = new Set(['amirot', 'pras', 'refua', 'olam', 'maslul']);
 
 const LENS: Record<string, string> = { biographical: 'עדשה ביוגרפית', tzimtzum: 'עדשת הצמצום', buddhist: 'עדשה בודהיסטית' };
 
@@ -104,7 +104,7 @@ export default function ArticleBody({ article, raw, back }: { article: Article; 
 
   if (BLOCKS.has(article.source)) {
     // The app writes an article as a run of blocks; a heading block opens a new section.
-    const secs: { title: string; blocks: Raw[] }[] = [{ title: article.source === 'amirot' ? 'הגילוי' : 'הכתבה', blocks: [] }];
+    const secs: { title: string; blocks: Raw[] }[] = [{ title: article.source === 'amirot' ? 'הגילוי' : article.source === 'maslul' ? 'התובנה' : 'הכתבה', blocks: [] }];
     arr(raw.body).forEach((b) => { if (b.h) secs.push({ title: String(b.h), blocks: [] }); else secs[secs.length - 1].blocks.push(b); });
     const mark = (t: unknown) => String(t ?? '').replace(/==(.+?)==/g, '**$1**');
     return (

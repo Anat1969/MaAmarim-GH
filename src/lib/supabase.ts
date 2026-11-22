@@ -84,10 +84,11 @@ export async function loadData(): Promise<Data> {
     all<{ article_key: string; topic_id: string }>(supabase.from('mag_article_topics').select('article_key,topic_id')),
     all<{ source: string; hint: string; topic_id: string }>(supabase.from('mag_topic_map').select('source,hint,topic_id').in('source', files.map(([s]) => s))),
   ]);
+  // A hint `*` is the topic of a whole source: an article born after the hints were written still gets one.
   // The view gives a table article its topic. A file article gets it here, by the same rule: the editor's choice first, then the hint.
   const chosen = new Map(overrides.map((o) => [o.article_key, o.topic_id]));
   const hinted = new Map(hints.map((h) => [`${h.source}:${h.hint}`, h.topic_id]));
-  const extra: Article[] = fromFiles.flat().map((a) => ({ ...a, topic_id: chosen.get(a.key) ?? hinted.get(a.key) ?? null }));
+  const extra: Article[] = fromFiles.flat().map((a) => ({ ...a, topic_id: chosen.get(a.key) ?? hinted.get(a.key) ?? hinted.get(`${a.source}:*`) ?? null }));
   // A source the code does not know yet must not break the page: its articles wait until it has a template.
   const known = [...articles.filter((a) => a.source in SOURCES), ...extra];
   return { articles: known, byKey: new Map(known.map((a) => [a.key, a])), topics, issues, items, threads };

@@ -135,6 +135,12 @@ Block sources (`BLOCKS` in `ArticleBody.tsx`: amirot, pras, refua, olam) share o
 SECOND LESSON: articles are not always under a tab called "כתבות". Look for "יצירות" too, and read what the page says.
 Every file article got a topic through `mag_topic_map` (hint = article id; Claude's assignment, the editor can change each).
 `mag-edit` accepts any `<source>:<id>` key, so a new source needs no redeploy there.
+A LIVE FILE SOURCE (Anat, 2026-11-22: "כך שאפליקצית מאמרים תקבל אותם גם כשנוצרת כתבה חדשה"): מסלול (`maslul`, the fashion
+app MeatsevetOfna-GH) keeps its collections in the database, so its articles.json is not a build file but the edge function
+`mo-articles` (read only, same shape, block template). Every collection whose three looks each have a photograph is an article;
+a new one arrives with no build and no deploy. Each article opens on its own A4 page (`#/articles/<id>`).
+A hint `*` in `mag_topic_map` is the topic of a whole source, so an article born later still gets a topic
+(`maslul:*` -> `machine`, Claude's assignment; the editor can change each article).
 
 RLS: public read, no write policies. Every write goes through the edge function `mag-edit` (`supabase/functions/mag-edit`,
 service role, verify_jwt off). Actions: check, set_topic, save_issue, set_item, remove_item, save_thread, thread_status.

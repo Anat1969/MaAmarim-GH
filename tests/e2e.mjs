@@ -109,6 +109,14 @@ await page.waitForSelector('.r-body .sec');
 ok(await page.locator('.r-body .para').count() >= 4 && await page.locator('.r-body .haiku').count() === 1, 'a Tzuna article opens in its own template: four paragraphs, numbers, insight, haiku');
 ok(/tzuna-gh\.vercel\.app\/#\/articles\?a=[a-z-]+$/.test(await page.locator('.crumbs a.origin').getAttribute('href') ?? ''), 'a Tzuna article links to itself in its app');
 
+await page.goto(`${BASE}/?view=library&src=maslul`, { waitUntil: 'networkidle' });
+const maslul = await page.locator('.card').count();
+ok(maslul >= 6, `מסלול is read live from its database: every collection with a photograph for each look (${maslul})`);
+await page.locator('.card').first().click();
+await page.waitForSelector('.r-body .sec');
+ok(/meatsevetofna-gh\.vercel\.app\/#\/articles\/[0-9a-f-]+$/.test(await page.locator('.crumbs a.origin').getAttribute('href') ?? ''), 'a מסלול article links to its own A4 page in the app');
+ok(await page.locator('.r-body .haiku').count() === 4, 'a מסלול article carries the four haiku with their readings');
+
 for (const [src, min, host] of [['pras', 21, 'prasnovel-gh'], ['refua', 7, 'refua-gh'], ['olam', 8, 'olam-gh']]) {
   await page.goto(`${BASE}/?view=library&src=${src}`, { waitUntil: 'networkidle' });
   const n = await page.locator('.card').count();
