@@ -63,7 +63,7 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
               <p className="mono">{c.topic.label}</p>
               <h3>{c.topic.question}</h3>
               <p className="count"><b>{c.threads}</b> חוטים עוברים כאן, מתוך <b>{c.total}</b> מאמרים בנושא</p>
-              <ul>{c.keys.slice(0, 7).map((k) => <li key={k}><Go to={{ a: k }}>{plain(data.byKey.get(k)!.title).split(':')[0]}<SourceTag source={data.byKey.get(k)!.source} /></Go></li>)}</ul>
+              <ul>{c.keys.slice(0, 7).map((k) => <li key={k}><Go to={{ a: k }}>{plain(data.byKey.get(k)!.title).split(':')[0]}<SourceTag source={data.byKey.get(k)!.source} article={data.byKey.get(k)!} /></Go></li>)}</ul>
               <div className="cand-foot">
                 <Go to={{ view: 'library', topic: c.topic.id }} className="btn">לכל מאמרי הנושא</Go>
                 {desk && <button className="btn on" onClick={() => open(c)}>פתיחת טיוטת גיליון</button>}

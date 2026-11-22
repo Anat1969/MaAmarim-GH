@@ -90,7 +90,7 @@ export default function Reader({ data, article, route, desk, onSaved, onError, o
       <div className="crumbs">
         <Go to={ctx.back} className="btn back">חזרה אל: {ctx.name}</Go>
         <a className="origin" href={originUrl(article)} target="_blank" rel="noreferrer" title={`פתיחת המאמר באפליקציה ${SOURCES[article.source].label}`}>
-          <span className="mono">המאמר במקור</span>{SOURCES[article.source].label}
+          <span className="mono">לאפליקציה שכתבה את המאמר</span>{SOURCES[article.source].label}
         </a>
         <TopicDot topic={topic} />
         <span className="mono">{dayMonth(article.created_at)} {new Date(article.created_at).getFullYear()}</span>
@@ -137,7 +137,7 @@ export default function Reader({ data, article, route, desk, onSaved, onError, o
           <h2>{threads.length ? `${threads.length === 1 ? 'חוט אחד יוצא' : `${threads.length} חוטים יוצאים`} מהמאמר הזה` : 'עוד באותו נושא'}</h2>
           {threads.map(({ t, other }) => (
             <div key={t.id} className={`thread-card ${t.status}`}>
-              <Go to={{ ...keep, a: other!.key }}><SourceTag source={other!.source} /><b>{plain(other!.title)}</b></Go>
+              <Go to={{ ...keep, a: other!.key }}><SourceTag source={other!.source} article={other!} /><b>{plain(other!.title)}</b></Go>
               <p className="rule">{t.rule}{t.status === 'proposed' && <span className="mono"> · הצעה, מחכה להחלטה</span>}</p>
               <p className="insight">{marked(t.insight)}</p>
               {t.action && <p className="do"><span className="mono">בעיר</span>{t.action}</p>}
@@ -145,7 +145,7 @@ export default function Reader({ data, article, route, desk, onSaved, onError, o
           ))}
           {!threads.length && <p className="small">עדיין לא נמתח חוט מהמאמר הזה. בינתיים, מאמרים שעונים על אותה שאלה: {topic?.question}</p>}
           {(threads.length < 2 ? more : more.slice(0, 2)).map((a) => (
-            <Go key={a.key} to={{ ...keep, a: a.key }} className="more"><SourceTag source={a.source} /><b>{plain(a.title)}</b><i>{plain(a.lede)}</i></Go>
+            <Go key={a.key} to={{ ...keep, a: a.key }} className="more"><SourceTag source={a.source} article={a} /><b>{plain(a.title)}</b><i>{plain(a.lede)}</i></Go>
           ))}
           {world.length > 0 && (
             <>

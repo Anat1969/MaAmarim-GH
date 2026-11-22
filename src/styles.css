@@ -394,3 +394,8 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .origin:hover { box-shadow: 0 0 0 2px var(--gold); }
 .origin .mono { color: var(--ink2); }
 @media print { .origin { display: none; } }
+
+/* The source sign as a link: on every card and row it opens the article in the app that wrote it. */
+.src-link { font-size: 0.8rem; font-weight: 600; padding: 0.2em 0.6em; cursor: pointer; color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; box-shadow: inset 0 -2px 0 var(--gold); position: relative; z-index: 1; transition: background 0.15s; }
+.src-link:hover, .src-link:focus-visible { background: var(--marker); }
+.origin { font-size: 1rem; padding: 0.5em 1em; box-shadow: 0 1px 2px rgb(46 46 43 / 12%), inset 0 -3px 0 var(--gold); border-bottom: 0; }

@@ -106,7 +106,7 @@ export default function Threads({ data, route, desk, onSaved, onError }: Props) 
             <div className="pair-big">
               {[current.a_key, current.b_key].map((k) => {
                 const a = data.byKey.get(k);
-                return a ? <Go key={k} to={{ a: k, from: 'threads', thread: current.id }}><SourceTag source={a.source} /><b>{plain(a.title)}</b></Go> : null;
+                return a ? <Go key={k} to={{ a: k, from: 'threads', thread: current.id }}><SourceTag source={a.source} article={a} /><b>{plain(a.title)}</b></Go> : null;
               })}
             </div>
             <dl className="three">

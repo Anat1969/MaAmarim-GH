@@ -69,6 +69,16 @@ ok(!watch.includes('chok_articles'), 'the watch no longer lists chok_articles as
 ok(await page.locator('.watch.alert').count() === 0, `no writing table is left outside the magazine: ${watch.split('\n')[0]}`);
 await page.evaluate(() => localStorage.removeItem('hut-desk'));
 
+await page.goto(`${BASE}/?view=library`, { waitUntil: 'networkidle' });
+const cards = await page.locator('.card').count();
+const linked = await page.locator('.card .src-link[data-href^="https://"]').count();
+ok(cards > 0 && linked === cards, `every card in the library links to its article in the app that wrote it (${linked} of ${cards})`);
+const [popup] = await Promise.all([page.waitForEvent('popup'), page.locator('.card .src-link').first().click()]);
+ok(/cultura-GH|magazin-gh|magazinishy|chok-tarbut/.test(popup.url()) && !page.url().includes('a='), `the source sign opens the source app in a new tab and does not open the reader (${popup.url()})`);
+await popup.close();
+await page.goto(BASE, { waitUntil: 'networkidle' });
+ok(await page.locator('.toc .src-link').count() >= 3, 'the issue contents link each article to its app');
+
 await page.goto(`${BASE}/?view=threads`, { waitUntil: 'networkidle' });
 ok(await page.locator('.arc').count() >= 1, 'threads map draws the threads');
 await page.locator('.t-row').nth(1).click();

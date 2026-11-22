@@ -80,7 +80,7 @@ export default function Cover({ data, issue, desk, onSaved, onError }: Props) {
                     <b>{plain(a.title)}</b>
                     <i>{it.note || plain(a.lede)}</i>
                   </span>
-                  <SourceTag source={a.source} />
+                  <SourceTag source={a.source} article={a} />
                 </Go>
               </li>
             );

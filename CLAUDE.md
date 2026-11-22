@@ -34,7 +34,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 
 ```bash
 npm run build
-npx vite preview --port 4173 & node tests/e2e.mjs     # 40 checks, reads live data, writes nothing
+npx vite preview --port 4173 & node tests/e2e.mjs     # 43 checks, reads live data, writes nothing
 node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```
@@ -68,7 +68,10 @@ here as part of the delivery. A source the code does not know is dropped in `loa
 check a view change first through a copy (`VITE_MAG_VIEW=mag_articles_next npm run build`), then replace the real view after deploy.
 LINK TO THE SOURCE AND ITS IMAGE (Anat, 2026-11-21): every article links to itself in the app that wrote it, not to the
 app's home: `originUrl()` in `src/lib/sources.ts` (culture `#/article/<id>`, mahut and ishy `#/a/<id>`, chok
-`/articles?law=<id>`), shown in the reader's top row ("המאמר במקור") and in the closing line. When adding a source, find its
+`/articles?law=<id>`). Anat did not see it when it was only inside the open article ("עדיין לא ראיתי קישור"), so the link is
+wherever an article appears: the source sign itself (`SourceTag` with `article`) on every library card, issue row, thread
+and related article opens the article in its app in a new tab (a span with role link, because the card is a link); in the
+reader a button in the top row ("לאפליקציה שכתבה את המאמר") and the closing line. The e2e test fails if a card has no such link. When adding a source, find its
 single-article address and open it in a browser before delivery. The image is the one the source app shows, wherever it keeps
 it: ishy has no image of its own and shows the case image from `merhav_readings` (synthesis first, then a lens).
 Not yet in: creations.json of Amirot / Refua / Tzuna / PrasNovel / Olam (static files, not tables), TAARUCHA works (short captions), Drive.
