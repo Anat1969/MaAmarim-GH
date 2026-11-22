@@ -94,7 +94,24 @@ await page.locator('.t-row').nth(1).click();
 ok(await page.locator('.t-row.on').count() === 1 && page.url().includes('thread='), 'a chosen thread is marked and kept in the address');
 ok(await page.locator('.t-detail .seg').count() === 0, 'readers see no editing buttons');
 
+// The format of an issue: its own address, a legend whose entries are ways in, and one action for the city.
+for (const id of ['issue-02', 'issue-03', 'issue-04']) {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`${BASE}/?issue=${id}`, { waitUntil: 'networkidle' });
+  const rows = await page.locator('.toc li a').count();
+  const appsIn = await page.locator('.legend .src-link').count();
+  ok(rows >= 5 && rows <= 7 && appsIn >= 3, `${id} opens by its own address: ${rows} articles from ${appsIn} apps`);
+  ok(await page.locator('.do.city').count() === 1 && await page.locator('.cover-thread').count() === 1, `${id} has a golden thread and an action for the city`);
+  ok(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 2), `${id} fits the screen with no page scroll`);
+}
+ok((await page.locator('.legend .src-link').first().getAttribute('href') ?? '').startsWith('https://'), 'a legend entry is a direct way into the app');
+await page.locator('.legend .lg-topic').first().click();
+ok(page.url().includes('view=library') && page.url().includes('topic='), 'a topic in the legend opens the collection on that topic');
+await page.goto(BASE, { waitUntil: 'networkidle' });
+ok(await page.locator('.legend').count() === 1, 'the published issue carries a legend too');
+
 await page.goto(`${BASE}/?view=issues`, { waitUntil: 'networkidle' });
+ok(await page.locator('.kind').count() === 1 && await page.locator('.cand .ripe').count() >= 1, 'the issues screen names the kind of magazine and says which question is ripe');
 ok(await page.locator('.issue-row').count() >= 1, 'issues are listed');
 
 for (const [w, h] of [[1865, 1160], [1280, 720], [390, 844]]) {
