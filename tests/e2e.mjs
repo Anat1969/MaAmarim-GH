@@ -10,7 +10,20 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
 
+// The entrance: what the magazine is, every issue with its number and question and a way in, and a legend for the issues.
 await page.goto(BASE, { waitUntil: 'networkidle' });
+ok(await page.locator('.ent-about h1').isVisible() && (await page.locator('.ent-about').innerText()).includes('מגזין אוצֵר'), 'the entrance presents the magazine');
+const entRows = await page.locator('.ent-row').count();
+ok(entRows >= 4, `the entrance lists every issue (${entRows})`);
+ok(await page.locator('.ent-row .num').count() === entRows && await page.locator('.ent-row .issue-txt i').count() === entRows, 'each issue shows its number and its question');
+ok(await page.locator('.ent-legend .lg-signs span').count() >= 4 && await page.locator('.ent-legend .src-link').count() >= 4, 'the issues have a legend of their own, with ways into the apps');
+ok(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 2), 'the entrance fits the screen with no page scroll');
+await page.locator('.ent-row').last().click();
+ok(page.url().includes('issue=issue-01') && await page.locator('.hero h1').isVisible(), 'a row on the entrance is a way into its issue');
+await page.locator('.brand').click();
+ok(await page.locator('.ent-about h1').isVisible(), 'the name of the magazine returns to the entrance');
+
+await page.goto(`${BASE}/?issue=issue-01`, { waitUntil: 'networkidle' });
 ok(await page.locator('ai-menu .logo').isVisible().catch(() => false) || await page.locator('ai-menu').count() === 1, 'A&I logo button in the top bar');
 ok(!(await page.locator('header >> text=העתקת קישור').first().isVisible().catch(() => false)), 'no loose development buttons in the bar');
 ok(await page.locator('.hero h1').isVisible(), 'cover shows the issue title');
@@ -76,7 +89,7 @@ ok(cards > 0 && linked === cards, `every card in the library links to its articl
 const [popup] = await Promise.all([page.waitForEvent('popup'), page.locator('.card .src-link').first().click()]);
 ok(/cultura-GH|magazin-gh|magazinishy|chok-tarbut/.test(popup.url()) && !page.url().includes('a='), `the source sign opens the source app in a new tab and does not open the reader (${popup.url()})`);
 await popup.close();
-await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.goto(`${BASE}/?issue=issue-01`, { waitUntil: 'networkidle' });
 ok(await page.locator('.toc .src-link').count() >= 3, 'the issue contents link each article to its app');
 
 await page.goto(`${BASE}/?view=library&src=amirot`, { waitUntil: 'networkidle' });
@@ -107,7 +120,7 @@ for (const id of ['issue-02', 'issue-03', 'issue-04']) {
 ok((await page.locator('.legend .src-link').first().getAttribute('href') ?? '').startsWith('https://'), 'a legend entry is a direct way into the app');
 await page.locator('.legend .lg-topic').first().click();
 ok(page.url().includes('view=library') && page.url().includes('topic='), 'a topic in the legend opens the collection on that topic');
-await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.goto(`${BASE}/?issue=issue-01`, { waitUntil: 'networkidle' });
 ok(await page.locator('.legend').count() === 1, 'the published issue carries a legend too');
 
 await page.goto(`${BASE}/?view=issues`, { waitUntil: 'networkidle' });
@@ -116,7 +129,7 @@ ok(await page.locator('.issue-row').count() >= 1, 'issues are listed');
 
 for (const [w, h] of [[1865, 1160], [1280, 720], [390, 844]]) {
   await page.setViewportSize({ width: w, height: h });
-  for (const path of ['/', '/?view=library', '/?view=threads', '/?view=issues']) {
+  for (const path of ['/', '/?issue=issue-01', '/?view=library', '/?view=threads', '/?view=issues']) {
     await page.goto(BASE + path, { waitUntil: 'networkidle' });
     const wide = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
     ok(!wide, `no horizontal scroll at ${w} on ${path}`);

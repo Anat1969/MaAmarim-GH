@@ -433,3 +433,45 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .ripe.yes { color: var(--green); }
 .ripe.no { color: var(--ink2); }
 @media (max-width: 900px), (max-aspect-ratio: 1/1) { .legend dt { min-width: 0; width: 100%; } }
+
+/* ---------- The entrance: what the magazine is, every issue with a way in, and a legend for the issues ---------- */
+.entrance { height: calc(100dvh - var(--bar)); padding: var(--air) var(--gut); display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr); grid-template-rows: minmax(0, 1fr) auto; gap: var(--air) calc(var(--air) * 1.6); }
+.ent-about { display: flex; flex-direction: column; justify-content: center; gap: 0.9rem; min-height: 0; }
+.ent-about h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(4rem, 9vw, 9rem); line-height: 0.9; }
+.ent-claim { font-family: var(--serif); font-weight: 400; font-size: clamp(1.4rem, 2.2vw, 2.2rem); line-height: 1.15; }
+.ent-text { display: grid; gap: 0.25rem; font-size: 1.05rem; max-width: 30rem; }
+.ent-text span { display: block; }
+.ent-nums { display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: 1.6rem; padding-block: 0.7rem; border-block: 1px solid var(--line); }
+.ent-nums dd { font-family: var(--serif); font-weight: 300; font-size: 2.6rem; line-height: 1; }
+.ent-nums dt { font-family: var(--mono); font-size: 0.7rem; color: var(--ink2); margin-top: 0.2rem; }
+.ent-go { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.ent-issues { display: flex; flex-direction: column; gap: 0.7rem; min-height: 0; }
+.ent-issues h2 { font-family: var(--serif); font-weight: 400; font-size: 1.5rem; }
+.ent-rows { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 0.6rem; padding: 2px; }
+.ent-row { flex: 1 1 0; min-height: 5.2rem; max-height: 11rem; grid-template-columns: auto 5rem 1fr auto; border-inline-start: 6px solid var(--c); }
+.ent-row .issue-pic { height: 100%; aspect-ratio: 1; }
+.ent-row .issue-txt b { font-size: clamp(1.4rem, 2.2vw, 2.2rem); }
+.ent-row .issue-txt em { display: flex; gap: 0.5em; align-items: center; flex-wrap: wrap; }
+.ent-row .lg-topic { color: var(--ink2); }
+.ent-row.draft .num { color: var(--grey); }
+.state { padding: 0.25em 0.7em; background: var(--wash); color: var(--ink2); white-space: nowrap; font-weight: 400; }
+.state.published { background: var(--ink); color: #fff; }
+.issue-nav a.draft:not(.on) { color: var(--grey); box-shadow: inset 0 -2px 0 var(--line); }
+.ent-legend { grid-column: 1 / -1; }
+.bar-c { display: inline-block; width: 6px; height: 1.1em; background: var(--gold); }
+@media (max-width: 900px), (max-aspect-ratio: 1/1) {
+  .entrance { height: auto; display: flex; flex-direction: column; }
+  .ent-rows { overflow: visible; }
+  .ent-row { flex: none; max-height: none; grid-template-columns: 5rem 3rem 1fr; }
+  .ent-row .state { grid-column: 1 / -1; justify-self: start; margin: 0 0 0.6rem 0.8rem; }
+  .ent-row > .mono { display: inline-block; }
+  .ent-nums { grid-template-columns: repeat(2, auto); gap: 0.8rem 2rem; }
+}
+@media (max-width: 900px), (max-aspect-ratio: 1/1) {
+  .ent-row { grid-template-columns: 5.5rem 2.8rem minmax(0, 1fr); align-items: start; gap: 0.6rem; padding-inline-end: 0.6rem; }
+  .ent-row .issue-pic { width: 5.5rem; height: auto; }
+  .ent-row .num { font-size: 1.9rem; padding-top: 0.5rem; }
+  .ent-row .issue-txt { padding-top: 0.4rem; }
+  .ent-row .issue-txt b { font-size: 1.35rem; }
+  .ent-row .issue-txt i { font-size: 1rem; }
+}

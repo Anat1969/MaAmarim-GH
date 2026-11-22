@@ -29,7 +29,8 @@ function candidates(data: Data): { topic: Topic; keys: string[]; threads: number
 }
 
 export default function Issues({ data, desk, onSaved, onError }: Props) {
-  const issues = data.issues.filter((i) => desk || i.status === 'published');
+  // An issue in preparation is shown to everyone, marked as such (the entrance does the same).
+  const issues = data.issues;
   const next = candidates(data);
 
   const open = async (c: ReturnType<typeof candidates>[number]) => {
@@ -59,7 +60,7 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
                   <b>{i.title}</b><i>{i.question}</i>
                   <em>{its.map((x) => plain(data.byKey.get(x.article_key)?.title)).filter(Boolean).join(' · ')}</em>
                 </span>
-                <span className="mono">{i.status === 'draft' ? 'טיוטה' : monthYear(i.published_at)} · {its.length} מאמרים · {new Set(its.map((x) => data.byKey.get(x.article_key)?.source).filter(Boolean)).size} אפליקציות</span>
+                <span className="mono">{i.status === 'draft' ? 'בהכנה' : monthYear(i.published_at)} · {its.length} מאמרים · {new Set(its.map((x) => data.byKey.get(x.article_key)?.source).filter(Boolean)).size} אפליקציות</span>
               </Go>
             );
           })}
