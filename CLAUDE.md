@@ -34,7 +34,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 
 ```bash
 npm run build
-npx vite preview --port 4173 & node tests/e2e.mjs     # 43 checks, reads live data, writes nothing
+npx vite preview --port 4173 & node tests/e2e.mjs     # 48 checks, reads live data, writes nothing
 node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```
@@ -74,7 +74,16 @@ and related article opens the article in its app in a new tab (a span with role 
 reader a button in the top row ("לאפליקציה שכתבה את המאמר") and the closing line. The e2e test fails if a card has no such link. When adding a source, find its
 single-article address and open it in a browser before delivery. The image is the one the source app shows, wherever it keeps
 it: ishy has no image of its own and shows the case image from `merhav_readings` (synthesis first, then a lens).
-Not yet in: creations.json of Amirot / Refua / Tzuna / PrasNovel / Olam (static files, not tables), TAARUCHA works (short captions), Drive.
+FILE SOURCES (Anat, 2026-11-22: "למה אתה אומר שאין כתבות? ראה כתבות באמירות"): an app that keeps its articles in its own
+code, not in a table, publishes them as an open file: `articles.json`, written on every build from its own data, with
+`Access-Control-Allow-Origin: *` on that file. The magazine reads it in `loadData` (`FILE_SOURCES` in `src/lib/sources.ts`),
+key `<source>:<id>`, topic by the same rule as the view (editor's choice, then `mag_topic_map` with hint = the article id),
+body kept in memory for the reader. A file that does not answer leaves the magazine as it is. Such articles have no date
+(`created_at` is empty: no date in the reader, group "בלי תאריך"). Connected this way: אמירות (9, template of blocks: p / h /
+pull / insight / haiku, `==x==` is a marker). `tests/print.mjs` reads the view only, so file articles are not print-checked.
+LESSON: before saying an app has no articles, OPEN THE APP and read its navigation; creations.json is not the list of articles.
+Still to connect the same way: מזון, גוף ונפש (Tzuna, page `#/articles`), גמד על כתפי ענקים (PrasNovel, "הגילוי הבא").
+No articles page found in רפואה and עולם נעלם (checked in a browser, 2026-11-22). Also not in: TAARUCHA works (short captions), Drive.
 
 RLS: public read, no write policies. Every write goes through the edge function `mag-edit` (`supabase/functions/mag-edit`,
 service role, verify_jwt off). Actions: check, set_topic, save_issue, set_item, remove_item, save_thread, thread_status.

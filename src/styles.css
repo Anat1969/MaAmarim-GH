@@ -402,3 +402,9 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .card-meta { flex-wrap: wrap; row-gap: 0.3rem; min-width: 0; }
 .card-meta .src-link { white-space: normal; }
 @media (max-width: 700px) { .src-link { font-size: 0.72rem; padding: 0.15em 0.45em; } }
+
+/* A pulled quote inside an article, and the note under a haiku (the Amirot template). */
+.pull { margin: 0.6rem 0; padding: 0.6rem 1rem; border-inline-start: 3px solid var(--gold); display: grid; gap: 0.3rem; break-inside: avoid; }
+.pull q { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; line-height: 1.35; }
+.pull cite { font-family: var(--mono); font-size: 0.72rem; color: var(--ink2); font-style: normal; }
+.haiku small { font-family: var(--sans, inherit); font-size: 0.82rem; color: var(--ink2); margin-top: 0.4rem; }

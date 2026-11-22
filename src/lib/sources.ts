@@ -6,6 +6,15 @@ export const SOURCES: Record<SourceId, { label: string; kind: string; url: strin
   mahut: { label: 'מהות', kind: 'מסה', url: 'https://magazin-gh.vercel.app', about: 'מסות אישיות על רוח, עיר ומכונה.' },
   ishy: { label: 'מהמרחב הפנימי', kind: 'מקרה', url: 'https://magazinishy.vercel.app', about: 'מקרה אישי, נקרא בשלוש עדשות.' },
   chok: { label: 'חוקי התנהגות', kind: 'חוק', url: 'https://chok-tarbut.vercel.app', about: 'חוק אחד, והתופעות שהוא מסביר בעולמות רחוקים.' },
+  amirot: { label: 'אמירות', kind: 'גילוי', url: 'https://amirot-gh.vercel.app', about: 'גילוי שעלה מהצלבת פתגמים מתרבויות רחוקות.' },
+};
+
+/**
+ * Sources that are not a table: the app publishes its articles as an open file (articles.json), written on every
+ * build from its own data. The magazine reads the file and keeps no copy. To add one: its app writes the same file.
+ */
+export const FILE_SOURCES: Partial<Record<SourceId, string>> = {
+  amirot: 'https://amirot-gh.vercel.app/articles.json',
 };
 export const SOURCE_IDS = Object.keys(SOURCES) as SourceId[];
 export const RADAR = { label: 'רדאר אקטואליה', url: 'https://radar-aktualya.vercel.app' };
@@ -16,5 +25,6 @@ export function originUrl(article: Pick<Article, 'key' | 'source'>): string {
   const base = SOURCES[article.source].url.replace(/\/$/, '');
   if (article.source === 'culture') return `${base}/#/article/${id}`;
   if (article.source === 'chok') return `${base}/articles?law=${id}`;
+  if (article.source === 'amirot') return `${base}/#/article?a=${id}`;
   return `${base}/#/a/${id}`;
 }

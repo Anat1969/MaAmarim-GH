@@ -1,4 +1,4 @@
-export type SourceId = 'culture' | 'mahut' | 'ishy' | 'chok';
+export type SourceId = 'culture' | 'mahut' | 'ishy' | 'chok' | 'amirot';
 
 /** One shape for every source: the view mag_articles. The body stays in `raw`, read only when an article opens. */
 export interface Article {
@@ -11,6 +11,7 @@ export interface Article {
   image: string | null;
   image2: string | null;
   hint: string | null;
+  /** Empty for an article whose app keeps no date (file sources). */
   created_at: string;
   topic_id: string | null;
 }

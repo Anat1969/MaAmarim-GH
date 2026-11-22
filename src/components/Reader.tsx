@@ -93,7 +93,7 @@ export default function Reader({ data, article, route, desk, onSaved, onError, o
           <span className="mono">לאפליקציה שכתבה את המאמר</span>{SOURCES[article.source].label}
         </a>
         <TopicDot topic={topic} />
-        <span className="mono">{dayMonth(article.created_at)} {new Date(article.created_at).getFullYear()}</span>
+        {article.created_at && <span className="mono">{dayMonth(article.created_at)} {new Date(article.created_at).getFullYear()}</span>}
         {desk && (
           <span className="desk-row">
             <label className="mono">נושא

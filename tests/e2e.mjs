@@ -79,6 +79,15 @@ await popup.close();
 await page.goto(BASE, { waitUntil: 'networkidle' });
 ok(await page.locator('.toc .src-link').count() >= 3, 'the issue contents link each article to its app');
 
+await page.goto(`${BASE}/?view=library&src=amirot`, { waitUntil: 'networkidle' });
+const amirot = await page.locator('.card').count();
+ok(amirot >= 9, `the fifth source, אמירות, is read from the open file its app publishes (${amirot})`);
+ok(await page.locator('.card .card-img img').count() === amirot, 'every Amirot article shows the image its own app shows');
+await page.locator('.card').first().click();
+await page.waitForSelector('.r-body .sec');
+ok(await page.locator('.r-body .pull').count() >= 1 && await page.locator('.r-body .insight').count() >= 1, 'an Amirot article opens in its own template: pulled quote and insight');
+ok(/amirot-gh\.vercel\.app\/#\/article\?a=[a-z]+$/.test(await page.locator('.crumbs a.origin').getAttribute('href') ?? ''), 'an Amirot article links to itself in Amirot');
+
 await page.goto(`${BASE}/?view=threads`, { waitUntil: 'networkidle' });
 ok(await page.locator('.arc').count() >= 1, 'threads map draws the threads');
 await page.locator('.t-row').nth(1).click();
