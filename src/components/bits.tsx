@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import type { Article, Data, Topic } from '../lib/types';
-import { SOURCES } from '../lib/sources';
+import { SOURCES, originUrl } from '../lib/sources';
 import { href, go, type Route } from '../lib/route';
 import { img } from '../lib/supabase';
 import { plain } from '../lib/text';
@@ -27,9 +27,25 @@ export function Go({ to, className, children, title, ...rest }: { to: Partial<Ro
   );
 }
 
-/** Where an article was written. The same sign on every screen. */
-export function SourceTag({ source }: { source: Article['source'] }) {
-  return <span className={`src src-${source}`}>{SOURCES[source].label}</span>;
+/**
+ * Where an article was written. The same sign on every screen. With `article` it is also the way there: it opens
+ * this article in the app that wrote it (Anat, 2026-11-21: every article links to its app). It sits inside cards
+ * and rows that are links themselves, so it is a span that acts as a link, never an anchor inside an anchor.
+ */
+export function SourceTag({ source, article }: { source: Article['source']; article?: Pick<Article, 'key' | 'source'> }) {
+  if (!article) return <span className={`src src-${source}`}>{SOURCES[source].label}</span>;
+  const open = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(originUrl(article), '_blank', 'noopener');
+  };
+  return (
+    <span className={`src src-${source} src-link`} role="link" tabIndex={0} data-href={originUrl(article)}
+      title={`פתיחת המאמר באפליקציה ${SOURCES[source].label}`}
+      onClick={open} onKeyDown={(e) => { if (e.key === 'Enter') open(e); }}>
+      {SOURCES[source].label}
+    </span>
+  );
 }
 
 export function TopicDot({ topic }: { topic: Topic | undefined }) {
@@ -54,7 +70,7 @@ export function Card({ data, article, to }: { data: Data; article: Article; to: 
         {article.image ? <img src={img(article.image, 480)} alt="" loading="lazy" decoding="async" /> : <Plate article={article} topic={topic} />}
       </div>
       <div className="card-txt">
-        <div className="card-meta"><SourceTag source={article.source} /><TopicDot topic={topic} /></div>
+        <div className="card-meta"><SourceTag source={article.source} article={article} /><TopicDot topic={topic} /></div>
         <h3>{plain(article.title)}</h3>
         {article.lede && <p>{plain(article.lede)}</p>}
       </div>
