@@ -126,6 +126,39 @@ export default function ArticleBody({ article, raw, back }: { article: Article; 
     );
   }
 
+  if (article.source === 'tzuna') {
+    // One A4 page in its own app: four short paragraphs, then what the app sets apart (from / to, quote, numbers, insight, haiku).
+    const mark = (t: unknown) => String(t ?? '').replace(/==(.+?)==/g, '**$1**');
+    const q = (raw.quote ?? null) as Raw | null;
+    const pull = (raw.pull ?? null) as Raw | null;
+    return (
+      <>
+        <Sec title={String(raw.kicker ?? 'הכתבה')}>
+          {arr(raw.body).map((t, i) => <Para key={i} text={mark(t)} lead={false} />)}
+        </Sec>
+        {pull && (
+          <p className="sec turn">
+            <span className="from"><span className="mono">{pull.fromL}</span>{marked(mark(pull.from))}</span>
+            <span className="to"><span className="mono">{pull.toL}</span>{marked(mark(pull.to))}</span>
+          </p>
+        )}
+        {q?.q && <blockquote className="sec pull"><q>{plain(String(q.q)).replace(/^"|"$/g, '')}</q><cite>{q.who}</cite></blockquote>}
+        {arr(raw.stats).length > 0 && (
+          <Sec title="במספרים" tone="quiet">
+            <dl className="practice">{arr(raw.stats).map((x, i) => <div key={i}><dt>{x[0]}</dt><dd>{x[1]}</dd></div>)}</dl>
+          </Sec>
+        )}
+        {raw.insight && <Sec title="התובנה" tone="do"><p className="insight">{marked(mark(raw.insight))}</p></Sec>}
+        {arr(raw.haiku).length > 0 && <div className="sec haiku">{arr(raw.haiku).map((l, k) => <span key={k}>{l}</span>)}<small>הייקו מקורי</small></div>}
+        {arr(raw.notes).length > 0 && (
+          <Sec title="מקורות" tone="quiet">
+            <ol className="steps">{arr(raw.notes).map((n, i) => <li key={i}>{String(n)}</li>)}</ol>
+          </Sec>
+        )}
+      </>
+    );
+  }
+
   const syn = (raw.synthesis ?? {}) as Raw;
   const turn = (raw.turn ?? {}) as Raw;
   return (
@@ -187,6 +220,14 @@ export function facts(article: Article, raw: Raw | null): { label: string; value
       { label: 'תחום', value: arr(law.domain).join(', ') },
       { label: 'מקור', value: law.source },
       { label: 'חוזק הראיות', value: law.evidence_strength ? `${law.evidence_strength} מתוך 5` : '' },
+    ].filter((f) => f.value);
+  }
+  if (article.source === 'tzuna') {
+    return [
+      { label: 'שלב', value: raw.zone },
+      { label: 'מדור', value: raw.kicker },
+      { label: 'מקורות', value: arr(raw.notes).length ? String(arr(raw.notes).length) : '' },
+      { label: 'התמונה', value: raw.credit },
     ].filter((f) => f.value);
   }
   if (article.source === 'amirot') {

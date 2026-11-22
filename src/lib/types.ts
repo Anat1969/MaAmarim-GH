@@ -1,4 +1,4 @@
-export type SourceId = 'culture' | 'mahut' | 'ishy' | 'chok' | 'amirot';
+export type SourceId = 'culture' | 'mahut' | 'ishy' | 'chok' | 'amirot' | 'tzuna';
 
 /** One shape for every source: the view mag_articles. The body stays in `raw`, read only when an article opens. */
 export interface Article {

@@ -23,7 +23,7 @@ async function all<T>(q: PromiseLike<{ data: unknown; error: { message: string }
 /** The bodies of articles that came from a file, kept in memory so the reader opens them without a second request. */
 const fileRaw = new Map<string, Record<string, unknown>>();
 
-type Feed = { articles?: { id: string; zone?: string; kicker?: string; title: string; sub?: string; image?: string | null; body?: Record<string, unknown>[] }[] };
+type Feed = { articles?: { id: string; zone?: string; kicker?: string; title: string; sub?: string; image?: string | null; body?: (Record<string, unknown> | string)[] }[] };
 
 /** One file source. A source that does not answer leaves the magazine as it is: its articles simply wait. */
 async function loadFile(source: SourceId, url: string): Promise<Omit<Article, 'topic_id'>[]> {
@@ -34,8 +34,10 @@ async function loadFile(source: SourceId, url: string): Promise<Omit<Article, 't
     return (feed.articles ?? []).map((a) => {
       const key = `${source}:${a.id}`;
       fileRaw.set(key, a as unknown as Record<string, unknown>);
-      const pull = (a.body ?? []).find((b) => 'pull' in b) as { pull?: string } | undefined;
-      return { key, source, title: a.title, kicker: a.kicker ?? null, lede: a.sub ?? null, quote: pull?.pull ?? null, image: a.image ?? null, image2: null, hint: a.id, created_at: '' };
+      // The quote on the cover: a block the app pulled out of the text (Amirot), or the article's own quote (Tzuna).
+      const pull = Array.isArray(a.body) ? (a.body.find((b) => typeof b === 'object' && b && 'pull' in b) as { pull?: string } | undefined) : undefined;
+      const own = (a as { quote?: { q?: string } | null }).quote?.q?.replace(/^"|"$/g, '');
+      return { key, source, title: a.title, kicker: a.kicker ?? null, lede: a.sub ?? null, quote: pull?.pull ?? own ?? null, image: a.image ?? null, image2: null, hint: a.id, created_at: '' };
     });
   } catch {
     return [];
