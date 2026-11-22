@@ -42,9 +42,17 @@ Most articles are in no issue, and that is right.
   written on the question yet, and an app to build (`BUILD_IDEAS`), each with the request READY TO COPY for the development
   chat of that app. After the seven topic questions, `NEW_QUESTIONS` proposes the next ones from articles already in the
   collection; on the desk one button opens a question as a new topic and moves its articles (`save_topic` in `mag-edit`).
+  The help shows for a ripe question too ("איך מחזקים"): it must never vanish from the screen when everything is ripe.
   All of it is Claude's proposal, marked as such. When a question gets an issue or a topic, update `ripen.ts`.
 - Issues: 01 התפר המוזהב (published). 02 הדף הלבן, 03 שולחן אחד, 04 משקל הרגע were drafted by Claude on 2026-11-22
   (articles, notes, claim, city action, one proposed thread): DRAFTS until Anat approves them on the desk.
+  05 מי שגר (city), 06 לוח השנה של השדה (nature), 07 היד והחישוב (machine) were drafted the same day at her word ("תכין את
+  שלושת טיוטות הגיליון למה שהבשיל"), each with a proposed golden thread. Also at her word the two new questions were opened
+  as topics: `body` (גוף ובריאות) and `knowledge` (ידע ודורות); nine topics now. Next issues to draft: these two.
+- חוקי התנהגות keeps most of its articles inside its code and saves to `chok_articles` only what was edited, so the
+  magazine sees 2 of its 8. Anat got a full request for its development chat (2026-11-22) to save all of them to the table
+  and to write five more; `mag_article_topics` already holds the topic of those laws (drift-law machine, chestertons-fence
+  and eyes-on-the-street city, kleiber-law nature, teaching-law knowledge, naked-mole-rat-law body).
 
 ## Design brief (visual doctrine, section 7)
 
@@ -65,7 +73,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 
 ```bash
 npm run build
-npx vite preview --port 4173 & node tests/e2e.mjs     # 85 checks, reads live data, writes nothing
+npx vite preview --port 4173 & node tests/e2e.mjs     # 94 checks, reads live data, writes nothing
 node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```
@@ -76,7 +84,7 @@ Playwright comes from the global install: `ln -s "$(npm root -g)/playwright" nod
 | Object | Purpose |
 |---|---|
 | view `mag_articles` | one shape for every source (`key` = `<source>:<uuid>`, title, kicker, lede, quote, image, topic_id, raw). security_invoker: source RLS applies |
-| `mag_topics` | 7 topics: label, question, colour |
+| `mag_topics` | 9 topics: label, question, colour (7 at the start; `body` and `knowledge` opened 2026-11-22) |
 | `mag_topic_map` | a hint the article already carries in its own app (human_need, topic, radar keyword) -> topic. New articles get a topic by themselves |
 | `mag_article_topics` | the editor's override for one article |
 | `mag_issues`, `mag_issue_items` | an issue is one question; `intro` = the curator's claim, `city` = the action for the city, `thread_id` = the golden thread; items have role (lead / support), position, note |

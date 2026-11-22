@@ -488,3 +488,7 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .complete li .btn { grid-column: 3; grid-row: 1 / span 3; align-self: center; white-space: nowrap; }
 .cand { grid-template-rows: none !important; align-content: start; }
 @media (max-width: 900px) { .complete li { grid-template-columns: 1.4rem minmax(0, 1fr); } .complete li .btn { grid-column: 2; grid-row: auto; justify-self: start; margin-top: 0.3rem; } }
+
+/* The contents never hide under the thread card: when a long question leaves too little room, the side column scrolls. */
+.toc { flex: 1 0 auto; }
+.question { text-wrap: balance; }
