@@ -14,7 +14,7 @@ page.on('pageerror', (e) => errors.push(e.message));
 await page.goto(BASE, { waitUntil: 'networkidle' });
 ok(await page.locator('.ent-about h1').isVisible() && (await page.locator('.ent-about').innerText()).includes('מגזין אוצֵר'), 'the entrance presents the magazine');
 const entRows = await page.locator('.ent-row').count();
-ok(entRows >= 4, `the entrance lists every issue (${entRows})`);
+ok(entRows >= 7, `the entrance lists every issue (${entRows})`);
 ok(await page.locator('.ent-row .num').count() === entRows && await page.locator('.ent-row .issue-txt i').count() === entRows, 'each issue shows its number and its question');
 ok(await page.locator('.ent-legend .lg-signs span').count() >= 4 && await page.locator('.ent-legend .src-link').count() >= 4, 'the issues have a legend of their own, with ways into the apps');
 ok(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 2), 'the entrance fits the screen with no page scroll');
@@ -131,7 +131,7 @@ ok(await page.locator('.t-row.on').count() === 1 && page.url().includes('thread=
 ok(await page.locator('.t-detail .seg').count() === 0, 'readers see no editing buttons');
 
 // The format of an issue: its own address, a legend whose entries are ways in, and one action for the city.
-for (const id of ['issue-02', 'issue-03', 'issue-04']) {
+for (const id of ['issue-02', 'issue-03', 'issue-04', 'issue-05', 'issue-06', 'issue-07']) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`${BASE}/?issue=${id}`, { waitUntil: 'networkidle' });
   const rows = await page.locator('.toc li a').count();

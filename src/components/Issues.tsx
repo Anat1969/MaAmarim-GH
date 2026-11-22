@@ -64,14 +64,14 @@ function Copy({ text, children }: { text: string; children: React.ReactNode }) {
  * How to complete a question (Anat, 2026-11-22): which article to write and in which app, with the request ready to copy,
  * and which app to build when nobody writes on it. Cheapest lever first.
  */
-function Complete({ id, label, question, list }: { id: string; label: string; question: string; list: Article[] }) {
+function Complete({ id, label, question, list, ripe = false }: { id: string; label: string; question: string; list: Article[]; ripe?: boolean }) {
   const writing = new Set(list.map((a) => a.source));
   const ideas = (WRITE_IDEAS[id] ?? []).filter((i) => !writing.has(i.app));
   const others = SOURCE_IDS.filter((s) => !writing.has(s) && !ideas.some((i) => i.app === s)).slice(0, 3);
   const build = BUILD_IDEAS[id];
   return (
     <div className="complete">
-      <h4>איך משלימים</h4>
+      <h4>{ripe ? 'איך מחזקים את הגיליון הזה' : 'איך משלימים'}</h4>
       <ol>
         {ideas.map((i) => (
           <li key={i.app + i.title}>
@@ -159,7 +159,7 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
               <h3>{c.topic.question}</h3>
               <p className="count"><b>{c.total}</b> מאמרים מ-<b>{c.apps}</b> אפליקציות, <b>{c.threads}</b> חוטים</p>
               <p className={`ripe ${c.missing ? 'no' : 'yes'}`}>{c.missing ? `עוד לא בשל. חסר: ${c.missing}.` : 'בשל לגיליון.'}</p>
-              {c.missing && <Complete id={c.topic.id} label={c.topic.label} question={c.topic.question} list={data.articles.filter((x) => x.topic_id === c.topic.id)} />}
+              <Complete id={c.topic.id} label={c.topic.label} question={c.topic.question} list={data.articles.filter((x) => x.topic_id === c.topic.id)} ripe={!c.missing} />
               <ul>{c.keys.slice(0, 7).map((k) => <li key={k}><Go to={{ a: k }}>{plain(data.byKey.get(k)!.title).split(':')[0]}<SourceTag source={data.byKey.get(k)!.source} article={data.byKey.get(k)!} /></Go></li>)}</ul>
               <div className="cand-foot">
                 <Go to={{ view: 'library', topic: c.topic.id }} className="btn">לכל מאמרי הנושא</Go>
@@ -183,7 +183,7 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
                 <p className="count"><b>{q.list.length}</b> מאמרים מ-<b>{new Set(q.list.map((a) => a.source)).size}</b> אפליקציות כבר באוסף</p>
                 <p className={`ripe ${q.missing ? 'no' : 'yes'}`}>{q.missing ? `עוד לא בשלה. חסר: ${q.missing}.` : 'בשלה לגיליון.'}</p>
                 <ul>{q.list.map((a) => <li key={a.key}><Go to={{ a: a.key }}>{plain(a.title).split(':')[0]}<SourceTag source={a.source} article={a} /></Go></li>)}</ul>
-                <Complete id={q.id} label={q.label} question={q.question} list={q.list} />
+                <Complete id={q.id} label={q.label} question={q.question} list={q.list} ripe={!q.missing} />
                 <div className="cand-foot">
                   {desk && <button className="btn on" onClick={() => openQuestion(q)}>פתיחת השאלה כנושא חדש</button>}
                 </div>
