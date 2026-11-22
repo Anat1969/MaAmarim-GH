@@ -79,6 +79,7 @@ const actions: Record<string, (p: P) => Promise<unknown>> = {
     const status = i.status === 'published' ? 'published' : 'draft';
     const row = {
       id, number, title, question, intro: text(i.intro, 600), status,
+      city: text(i.city, 240), thread_id: UUID.test(String(i.thread_id ?? '')) ? String(i.thread_id) : null,
       published_at: status === 'published' ? (before?.[0]?.published_at ?? new Date().toISOString()) : null,
       updated_at: new Date().toISOString(),
     };

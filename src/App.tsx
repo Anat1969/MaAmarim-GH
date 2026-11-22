@@ -40,7 +40,8 @@ export default function App() {
   const issue = useMemo(() => {
     if (!data) return undefined;
     const visible = data.issues.filter((i) => desk || i.status === 'published');
-    return visible.find((i) => i.id === route.issue) ?? visible[0];
+    // A draft is not listed to readers, but its own address opens it: the editor can send a draft before it is published.
+    return data.issues.find((i) => i.id === route.issue) ?? visible[0];
   }, [data, desk, route.issue]);
 
   const items = useMemo<MenuItem[]>(() => [
@@ -54,7 +55,7 @@ export default function App() {
     <div className={`app ${desk ? 'desk' : ''}`}>
       <header className="bar">
         <a className="brand" href={href({})} onClick={(e) => { e.preventDefault(); go({}); }}>
-          <b>חוט</b><span>המגזין מעל האפליקציות</span>
+          <b>חוט</b><span>מגזין אוצֵר: נכתב באפליקציות, נאצר כאן</span>
         </a>
         <nav aria-label="חלקי המגזין">
           <Go to={{}} className={tab === 'cover' ? 'on' : ''}>הגיליון</Go>
@@ -83,7 +84,7 @@ export default function App() {
           : route.view === 'library' ? <Library data={data} route={route} desk={desk} />
           : route.view === 'threads' ? <Threads data={data} route={route} desk={desk} onSaved={onSaved} onError={onError} />
           : route.view === 'issues' ? <Issues data={data} desk={desk} onSaved={onSaved} onError={onError} />
-          : issue ? <Cover key={issue.id} data={data} issue={issue} desk={desk} onSaved={onSaved} onError={onError} />
+          : issue ? <Cover key={issue.id} data={data} issue={issue} issues={data.issues.filter((i) => desk || i.status === 'published' || i.id === issue.id)} desk={desk} onSaved={onSaved} onError={onError} />
           : <div className="empty-state page"><h2>עוד לא יצא גיליון</h2><p>בינתיים כל המאמרים פתוחים לקריאה.</p><Go to={{ view: 'library' }} className="btn on">לכל המאמרים</Go></div>
       )}
 

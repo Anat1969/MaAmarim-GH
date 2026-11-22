@@ -15,6 +15,24 @@ The portfolio (AppOfApp-GH) has an entry page to it; the reading engine lives he
 
 Live: https://maamarim-gh.vercel.app · Pages: https://anat1969.github.io/MaAmarim-GH/
 
+## The kind of magazine: מגזין אוצֵר (Anat, 2026-11-22, chose "לפי ההמלצה שלך")
+
+Anat asked how the issues are arranged and asked for a name for the kind of magazine, a format, several issues, and a
+difference between them, each with a legend and a direct way in. The idea comes from the museum: "כל המאמרים" is the
+permanent COLLECTION (everything the apps wrote); an ISSUE is a temporary EXHIBITION out of it, with a curator's claim.
+Most articles are in no issue, and that is right.
+- What differs between issues: the QUESTION (one per issue; the topic questions are the first seven).
+- Fixed format of every issue: one question and one cover image; the curator's claim (`intro`, one marked sentence); a lead
+  article and up to six more, from AT LEAST THREE APPS; one golden thread (`mag_issues.thread_id`; a proposed thread shows as
+  a proposal); "לעיר", one action for the city (`mag_issues.city`); a LEGEND; its own address (`?issue=<id>`, opens a draft too).
+- The legend (`.legend` in `Cover.tsx`) is made of ways in: each app in the issue links to the app, each topic to the
+  collection on that topic, plus the signs (lead, approved / proposed thread, the source link).
+- The cover has a switcher between the issues (`.issue-nav`); readers see published issues, the desk sees drafts too.
+- Ripeness (`Issues.tsx`, `RIPE`): a question is ripe for an issue at 7 articles from 3 apps; otherwise the screen says what
+  is missing. An unripe question is a pointer to what is worth writing next.
+- Issues: 01 התפר המוזהב (published). 02 הדף הלבן, 03 שולחן אחד, 04 משקל הרגע were drafted by Claude on 2026-11-22
+  (articles, notes, claim, city action, one proposed thread): DRAFTS until Anat approves them on the desk.
+
 ## Design brief (visual doctrine, section 7)
 
 1. Message: articles written apart, one thread between them.
@@ -34,7 +52,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 
 ```bash
 npm run build
-npx vite preview --port 4173 & node tests/e2e.mjs     # 48 checks, reads live data, writes nothing
+npx vite preview --port 4173 & node tests/e2e.mjs     # 61 checks, reads live data, writes nothing
 node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```
@@ -48,7 +66,7 @@ Playwright comes from the global install: `ln -s "$(npm root -g)/playwright" nod
 | `mag_topics` | 7 topics: label, question, colour |
 | `mag_topic_map` | a hint the article already carries in its own app (human_need, topic, radar keyword) -> topic. New articles get a topic by themselves |
 | `mag_article_topics` | the editor's override for one article |
-| `mag_issues`, `mag_issue_items` | an issue is one question; items have role (lead / support), position, note |
+| `mag_issues`, `mag_issue_items` | an issue is one question; `intro` = the curator's claim, `city` = the action for the city, `thread_id` = the golden thread; items have role (lead / support), position, note |
 | `mag_threads` | two articles + rule (why), insight (what it means), action (what to do in the city); proposed / approved / rejected |
 | `mag_source_watch`, fn `mag_unlinked()` | the watch: writing sources not in the magazine yet (ignore / pending) |
 | `mag_log` | safety net: every write with the row as it was before |
