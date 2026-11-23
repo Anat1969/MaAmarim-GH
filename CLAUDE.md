@@ -165,12 +165,26 @@ Images are served small through Supabase image rendering (`img()` in `src/lib/su
 - ONE WAY TO EACH PLACE (Anat, 2026-11-23: "לא עמוסה, לא כפתורים מיותרים... אין צורך למקם את אותו כפתור ... גם בסרגל
   ניווט וגם בסוף מאמר"): what the bar offers is not repeated on a page. Removed: the two buttons on the entrance, the footer of
   three buttons on the cover, the second link to the source app at the end of an article (the top row keeps it), the list of
-  issues on the fourth tab (it lives on the entrance; the tab is now "הגיליון הבא"), and a button per row in "איך משלימים"
+  issues on the fourth tab (it lives on the entrance; the tab is now "המלצה לעריכה לגיליון הבא"), and a button per row in "איך משלימים"
   (the row itself copies the request, `.copy-row`). The e2e test fails when a page button points where a bar tab points.
 - ONE GRID FOR A LIST (Anat, 2026-11-23: "רשימת הטקסט תהיה מיושרת בגריד מסודר"): rows of a list share fixed column widths,
   never `auto`, so a wide image cannot push the text. Entrance rows: `7rem 5.5rem minmax(0,1fr) 9.5rem`; the e2e test checks
   that number, title and status stand on the same lines in every row. Cards side by side stack from the top (flex column,
   footer pushed down), so a taller neighbour never opens a gap inside a shorter one.
+- HIERARCHY AND FOLDS (Anat, 2026-11-23: "להגדיל את הפונטים ולשמר היררכיה ולהבליט תובנות... תפרק את המסכים למסגרות תוכן
+  שחבויות בתוך כפתור שפותח אותם... יש מקום להבליט את התובנות על החיבורים, ואז לפתוח בצורה היררכית את שאר המידע"):
+  1. The base type is a quarter larger: `html` `clamp(16px, min(1.02vw, 1.95vh), 22px)` (about 18px on her window), and no
+     text is under 0.84rem; the e2e test fails on any text under 13px on any screen.
+  2. The cover side reads in one order: issue numbers (named "גיליונות"), the question, the curator's claim, THE INSIGHT of
+     the issue (`.hidden-big`, the largest text after the question, gold edge), then the way to it as an aligned list
+     (`.steps`: הגלוי, מתחתיו, ומכאן). Everything else waits in folds (`<details name="cover-fold">`, one open at a time,
+     closed by default, an opened fold scrolls into view): the articles (with column names: מס׳, הכתבה, נכתב באפליקציה), the
+     golden thread, the city, the legend.
+  3. EVERY LIST OF NAMES OR BUTTONS IS NAMED (`.cat`): "גיליונות", "סידור", "סינון לפי נושא", "סינון לפי האפליקציה שבה נכתב",
+     "הכתבות שכבר עונות על השאלה, ובאיזו אפליקציה נכתבו".
+  4. The fourth tab and its screen are "המלצה לעריכה לגיליון הבא" (her words). Its finding comes first in one marked line;
+     the help to complete each question is a fold with the number of proposals. On a phone the tabs keep their width and
+     the row scrolls sideways.
 - Top bar: name (home), four content tabs, and the one A&I logo button. Nothing else.
 - Cover, reader and threads fit the screen with no page scroll; long text scrolls inside its frame. The library is a list and scrolls.
 - An image is never cropped (object-fit: contain, or its natural ratio). No image: a plate drawn from the topic colour.

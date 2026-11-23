@@ -92,17 +92,20 @@ export default function Library({ data, route, desk = false }: { data: Data; rou
         </div>
         <div className="band-row">
           <div className="seg" role="group" aria-label="סידור הרשימה">
+            <span className="cat chips-cat">סידור</span>
             {GROUPS.map((g) => (
               <button key={g.id} className={`btn ${route.group === g.id ? 'on' : ''}`} aria-pressed={route.group === g.id} onClick={() => set({ group: g.id })}>{g.label}</button>
             ))}
           </div>
           <div className="chips" role="group" aria-label="נושא">
+            <span className="cat chips-cat">סינון לפי נושא</span>
             {data.topics.map((t) => (
               <button key={t.id} className={`chip ${route.topic === t.id ? 'on' : ''}`} aria-pressed={route.topic === t.id}
                 style={{ '--c': t.color } as React.CSSProperties} onClick={() => set({ topic: route.topic === t.id ? null : t.id })}>{t.label}</button>
             ))}
           </div>
           <div className="chips" role="group" aria-label="מקור">
+            <span className="cat chips-cat">סינון לפי האפליקציה שבה נכתב</span>
             {SOURCE_IDS.map((s) => (
               <button key={s} className={`chip plain ${route.src === s ? 'on' : ''}`} aria-pressed={route.src === s} onClick={() => set({ src: route.src === s ? null : s })}>{SOURCES[s].label}</button>
             ))}

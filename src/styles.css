@@ -22,7 +22,8 @@
   --c: var(--ink);
 }
 /* The page grows with the window: everything is sized in rem. Anat's screen is 1865 x 1160. */
-html { font-size: clamp(13px, min(0.9vw, 1.6vh), 21px); }
+/* Larger by a quarter (Anat, 2026-11-23: "הכל קטן ולא קריא"): on her 1920 x 920 window the base is about 18px. */
+html { font-size: clamp(16px, min(1.02vw, 1.95vh), 22px); }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-weight: 400; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
@@ -32,8 +33,10 @@ img { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; color: inherit; }
 mark { background: linear-gradient(transparent 12%, var(--marker) 12%, var(--marker) 88%, transparent 88%); color: inherit; font-weight: 600; padding: 0 0.12em; }
 q { quotes: '“' '”'; }
-.mono { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.02em; color: var(--grey); font-weight: 400; }
-.small { font-size: 0.86rem; color: var(--ink2); }
+.mono { font-family: var(--mono); font-size: 0.82rem; letter-spacing: 0.02em; color: var(--grey); font-weight: 400; }
+.small { font-size: 0.98rem; color: var(--ink2); }
+/* The name of a group: every list of names or buttons says what it is. */
+.cat { font-family: var(--sans); font-size: 0.86rem; font-weight: 600; color: var(--ink2); letter-spacing: 0.01em; }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
@@ -41,15 +44,15 @@ q { quotes: '“' '”'; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5em; min-height: 2.5rem; padding: 0 1rem; border: 0; border-radius: 0; background: var(--wash); color: var(--ink); cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: box-shadow 0.15s, background 0.15s; white-space: nowrap; }
 .btn:hover { box-shadow: var(--shadow); background: var(--white); }
 .btn.on, .btn[aria-pressed='true'] { background: var(--ink); color: var(--white); box-shadow: inset 0 2px 5px rgb(0 0 0 / 35%); }
-.btn.small { min-height: 2rem; padding: 0 0.7rem; font-size: 0.8rem; }
+.btn.small { min-height: 2rem; padding: 0 0.7rem; font-size: 0.86rem; }
 .btn:disabled, .btn.off { opacity: 0.45; cursor: default; box-shadow: none; background: var(--wash); }
 .link { border: 0; background: none; padding: 0; cursor: pointer; color: var(--ink2); font-size: 0.82rem; text-decoration: underline; text-underline-offset: 0.2em; }
 .seg { display: inline-flex; gap: 2px; }
 .seg .btn { min-width: 6.4rem; }
 
 /* Where an article was written, and its topic: the same two signs on every screen. */
-.src { font-family: var(--mono); font-size: 0.68rem; color: var(--ink2); background: var(--wash); padding: 0.12em 0.5em; white-space: nowrap; }
-.topic-dot { display: inline-flex; align-items: center; gap: 0.4em; font-size: 0.76rem; color: var(--ink2); white-space: nowrap; }
+.src { font-family: var(--mono); font-size: 0.84rem; color: var(--ink2); background: var(--wash); padding: 0.12em 0.5em; white-space: nowrap; }
+.topic-dot { display: inline-flex; align-items: center; gap: 0.4em; font-size: 0.84rem; color: var(--ink2); white-space: nowrap; }
 .topic-dot::before { content: ''; width: 0.62em; height: 0.62em; background: var(--c); }
 .topic-dot.none::before { background: var(--line); }
 .knot { display: inline-block; width: 1.6em; height: 2px; background: var(--c, var(--gold)); vertical-align: middle; margin: 0 0.5em; }
@@ -58,7 +61,7 @@ q { quotes: '“' '”'; }
 .bar { position: sticky; top: 0; z-index: 30; height: var(--bar); display: flex; align-items: center; gap: 1.5rem; padding: 0 var(--gut); background: var(--white); box-shadow: 0 1px 0 var(--line); }
 .brand { display: flex; align-items: baseline; gap: 0.7rem; }
 .brand b { font-family: var(--serif); font-size: 1.7rem; font-weight: 500; line-height: 1; }
-.brand span { font-size: 0.78rem; color: var(--grey); }
+.brand span { font-size: 0.84rem; color: var(--grey); }
 .bar nav { display: flex; gap: 2px; margin-inline-start: 1rem; }
 .bar nav a { display: inline-flex; align-items: center; height: 2.3rem; min-width: 6.4rem; justify-content: center; padding: 0 0.9rem; font-size: 0.9rem; font-weight: 500; background: transparent; transition: background 0.15s, box-shadow 0.15s; }
 .bar nav a:hover { background: var(--wash); box-shadow: var(--shadow); }
@@ -117,7 +120,7 @@ q { quotes: '“' '”'; }
 .do .mono { color: var(--green); background: var(--green-wash); padding: 0 0.45em; flex: none; }
 
 .desk-fields { display: grid; gap: 0.5rem; }
-label { display: grid; gap: 0.2rem; font-size: 0.8rem; color: var(--ink2); }
+label { display: grid; gap: 0.2rem; font-size: 0.86rem; color: var(--ink2); }
 label > span { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 input, textarea, select { border: 0; border-radius: 0; background: var(--white); box-shadow: inset 0 0 0 1px var(--line); padding: 0.5rem 0.7rem; font-size: 0.95rem; color: var(--ink); width: 100%; resize: vertical; }
 input:focus, textarea:focus, select:focus { box-shadow: inset 0 0 0 2px var(--gold); }
@@ -167,10 +170,10 @@ input:focus, textarea:focus, select:focus { box-shadow: inset 0 0 0 2px var(--go
 .r-hero h1 { font-size: clamp(1.9rem, 3vw, 3.2rem); line-height: 1.05; }
 .r-hero q { font-size: 0.98rem; color: rgb(255 255 255 / 88%); }
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0.5rem 1.2rem; padding: 0.8rem 1rem; background: var(--white); box-shadow: 0 1px 2px rgb(46 46 43 / 8%); border-inline-start: 4px solid var(--c); flex: none; }
-.facts dt { font-family: var(--mono); font-size: 0.68rem; color: var(--grey); }
+.facts dt { font-family: var(--mono); font-size: 0.84rem; color: var(--grey); }
 .facts dd { font-size: 0.94rem; font-weight: 500; }
 .r-links { display: grid; gap: 0.6rem; align-content: start; }
-.r-links h2 { font-family: var(--mono); font-size: 0.78rem; font-weight: 500; color: var(--ink); margin-top: 0.3rem; }
+.r-links h2 { font-family: var(--mono); font-size: 0.84rem; font-weight: 500; color: var(--ink); margin-top: 0.3rem; }
 .thread-card { background: var(--white); box-shadow: 0 1px 2px rgb(46 46 43 / 8%); padding: 0.75rem 0.9rem; display: grid; gap: 0.25rem; border-top: 3px solid var(--gold); }
 .thread-card.proposed { border-top-style: dashed; }
 .thread-card a, .more { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 0.1rem 0.6rem; }
@@ -186,20 +189,20 @@ input:focus, textarea:focus, select:focus { box-shadow: inset 0 0 0 2px var(--go
 .sec { margin-bottom: 1.5rem; }
 .sec h3 { break-after: avoid; }
 .fig, .sec-do, .series, .turn, .haiku, .steps li, .para .sent { break-inside: avoid; }
-.sec h3 { font-family: var(--mono); font-size: 0.78rem; font-weight: 500; color: var(--c); padding-bottom: 0.3rem; margin-bottom: 0.55rem; box-shadow: inset 0 -2px 0 var(--c); display: inline-block; }
+.sec h3 { font-family: var(--mono); font-size: 0.84rem; font-weight: 500; color: var(--c); padding-bottom: 0.3rem; margin-bottom: 0.55rem; box-shadow: inset 0 -2px 0 var(--c); display: inline-block; }
 .sec .para { font-size: 1rem; line-height: 1.7; gap: 0.5em; }
 .sec-do { background: var(--green-wash); padding: 0.9rem 1rem; }
 .sec-do h3 { color: var(--green); box-shadow: inset 0 -2px 0 var(--green); }
 .sec-quiet .para { font-size: 0.9rem; color: var(--ink2); line-height: 1.6; }
 .steps { counter-reset: s; display: grid; gap: 0.55rem; }
 .steps li { counter-increment: s; display: grid; grid-template-columns: 1.8rem 1fr; line-height: 1.55; }
-.steps li::before { content: counter(s, decimal-leading-zero); font-family: var(--mono); font-size: 0.74rem; color: var(--grey); padding-top: 0.25em; }
+.steps li::before { content: counter(s, decimal-leading-zero); font-family: var(--mono); font-size: 0.84rem; color: var(--grey); padding-top: 0.25em; }
 .fig img { width: 100%; height: auto; }
 .fig figcaption { display: flex; gap: 0.7rem; align-items: baseline; font-family: var(--serif); font-size: 1rem; padding-top: 0.4rem; }
 .practice { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem 1.2rem; }
-.practice dt { font-family: var(--mono); font-size: 0.7rem; color: var(--green); }
+.practice dt { font-family: var(--mono); font-size: 0.84rem; color: var(--green); }
 .practice dd { font-size: 0.92rem; line-height: 1.5; }
-.source { font-size: 0.74rem; color: var(--grey); text-decoration: underline; text-underline-offset: 0.2em; }
+.source { font-size: 0.84rem; color: var(--grey); text-decoration: underline; text-underline-offset: 0.2em; }
 .series { display: grid; gap: 0.2rem; padding: 0.7rem 0.9rem; background: var(--wash); }
 .series a { font-family: var(--serif); font-size: 1.1rem; font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
 .series i { font-style: normal; font-size: 0.88rem; color: var(--ink2); }
@@ -212,7 +215,7 @@ input:focus, textarea:focus, select:focus { box-shadow: inset 0 0 0 2px var(--go
 .lens { margin-bottom: 0.3rem; }
 .sec .insight { margin-bottom: 0.5rem; font-weight: 500; }
 .haiku { display: grid; gap: 0.1rem; font-family: var(--serif); font-size: 1.35rem; font-weight: 300; text-align: center; padding: 1rem 0; border-block: 1px solid var(--line); }
-.origin-line { margin-top: 0.6rem; padding-top: 0.8rem; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--grey); }
+.origin-line { margin-top: 0.6rem; padding-top: 0.8rem; border-top: 1px solid var(--line); font-size: 0.86rem; color: var(--grey); }
 .origin-line a { text-decoration: underline; text-underline-offset: 0.2em; color: var(--ink2); }
 
 /* The pager never moves: same place, same width, on every article. */
@@ -260,12 +263,12 @@ input:focus, textarea:focus, select:focus { box-shadow: inset 0 0 0 2px var(--go
 .pair-big b { font-family: var(--serif); font-weight: 500; font-size: 1.45rem; line-height: 1.15; }
 .pair-big a:hover b { text-decoration: underline; text-underline-offset: 0.2em; }
 .three { display: grid; gap: 0.7rem; }
-.three dt { font-family: var(--mono); font-size: 0.7rem; color: var(--grey); }
+.three dt { font-family: var(--mono); font-size: 0.84rem; color: var(--grey); }
 .three dd { font-size: 1.04rem; }
 .three .do { display: grid; color: var(--green); background: var(--green-wash); padding: 0.5rem 0.7rem; }
 .three .do dt { color: var(--green); }
 .t-lists { display: grid; gap: 3px; }
-.t-lists h2 { font-family: var(--mono); font-size: 0.78rem; font-weight: 500; margin: 0.6rem 0 0.2rem; }
+.t-lists h2 { font-family: var(--mono); font-size: 0.84rem; font-weight: 500; margin: 0.6rem 0 0.2rem; }
 .t-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0 0.2rem; text-align: start; border: 0; border-radius: 0; background: var(--white); padding: 0.5rem 0.8rem; cursor: pointer; border-inline-start: 4px solid var(--c); box-shadow: 0 1px 2px rgb(46 46 43 / 8%); transition: box-shadow 0.15s; }
 .t-row.proposed { border-inline-start-style: dashed; }
 .t-row b { font-family: var(--serif); font-weight: 500; font-size: 1rem; }
@@ -320,11 +323,11 @@ input:focus, textarea:focus, select:focus { box-shadow: inset 0 0 0 2px var(--go
 
 /* ---------- Narrow screens: one column, the page scrolls ---------- */
 @media (max-width: 900px), (max-aspect-ratio: 1/1) {
-  html { font-size: 15px; }
+  html { font-size: 16px; }
   .bar { height: auto; min-height: var(--bar); flex-wrap: wrap; gap: 0.3rem 0.8rem; padding-block: 0.4rem; }
   .brand span { display: none; }
   .bar nav { order: 3; width: 100%; margin: 0; overflow-x: auto; }
-  .bar nav a { min-width: 0; flex: 1; padding: 0 0.5rem; white-space: nowrap; }
+  .bar nav a { min-width: 0; flex: none; padding: 0 0.85rem; white-space: nowrap; }
   .desk-tag { display: none; }
   .cover, .reader, .threads { height: auto; display: flex; flex-direction: column; }
   .hero { width: 100%; height: auto; }
@@ -394,17 +397,17 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 @media print { .origin { display: none; } }
 
 /* The source sign as a link: on every card and row it opens the article in the app that wrote it. */
-.src-link { font-size: 0.8rem; font-weight: 600; padding: 0.2em 0.6em; cursor: pointer; color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; box-shadow: inset 0 -2px 0 var(--gold); position: relative; z-index: 1; transition: background 0.15s; }
+.src-link { font-size: 0.86rem; font-weight: 600; padding: 0.2em 0.6em; cursor: pointer; color: var(--ink); text-decoration: underline; text-underline-offset: 0.2em; box-shadow: inset 0 -2px 0 var(--gold); position: relative; z-index: 1; transition: background 0.15s; }
 .src-link:hover, .src-link:focus-visible { background: var(--marker); }
 .origin { font-size: 1rem; padding: 0.5em 1em; box-shadow: 0 1px 2px rgb(46 46 43 / 12%), inset 0 -3px 0 var(--gold); border-bottom: 0; }
 .card-meta { flex-wrap: wrap; row-gap: 0.3rem; min-width: 0; }
 .card-meta .src-link { white-space: normal; }
-@media (max-width: 700px) { .src-link { font-size: 0.72rem; padding: 0.15em 0.45em; } }
+@media (max-width: 700px) { .src-link { font-size: 0.84rem; padding: 0.15em 0.45em; } }
 
 /* A pulled quote inside an article, and the note under a haiku (the Amirot template). */
 .pull { margin: 0.6rem 0; padding: 0.6rem 1rem; border-inline-start: 3px solid var(--gold); display: grid; gap: 0.3rem; break-inside: avoid; }
 .pull q { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; line-height: 1.35; }
-.pull cite { font-family: var(--mono); font-size: 0.72rem; color: var(--ink2); font-style: normal; }
+.pull cite { font-family: var(--mono); font-size: 0.84rem; color: var(--ink2); font-style: normal; }
 .haiku small { font-family: var(--sans, inherit); font-size: 0.82rem; color: var(--ink2); margin-top: 0.4rem; }
 
 /* ---------- The format of an issue: its place among the issues, its action for the city, its legend ---------- */
@@ -441,7 +444,7 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .ent-text span { display: block; }
 .ent-nums { display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: 1.6rem; padding-block: 0.7rem; border-block: 1px solid var(--line); }
 .ent-nums dd { font-family: var(--serif); font-weight: 300; font-size: 2.6rem; line-height: 1; }
-.ent-nums dt { font-family: var(--mono); font-size: 0.7rem; color: var(--ink2); margin-top: 0.2rem; }
+.ent-nums dt { font-family: var(--mono); font-size: 0.84rem; color: var(--ink2); margin-top: 0.2rem; }
 .ent-issues { display: flex; flex-direction: column; gap: 0.7rem; min-height: 0; }
 .ent-issues h2 { font-family: var(--serif); font-weight: 400; font-size: 1.5rem; }
 .ent-rows { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 0.6rem; padding: 2px; }
@@ -483,12 +486,12 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .complete h4 { font-family: var(--serif); font-weight: 500; font-size: 1.05rem; }
 .complete ol { display: grid; gap: 0.55rem; list-style: none; counter-reset: c; }
 .complete h4 { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; }
-.complete h4 .mono { font-family: var(--mono); font-weight: 400; font-size: 0.66rem; color: var(--ink2); }
+.complete h4 .mono { font-family: var(--mono); font-weight: 400; font-size: 0.84rem; color: var(--ink2); }
 .complete li { counter-increment: c; border: 0 !important; }
 .copy-row { width: 100%; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) 4rem; column-gap: 0.5rem; row-gap: 0.1rem; align-items: start; text-align: start; padding: 0.35rem 0.3rem; border: 0; background: transparent; color: inherit; font: inherit; cursor: copy; transition: background 0.15s; }
-.copy-row::before { content: counter(c); grid-row: 1 / span 3; font-family: var(--mono); font-size: 0.8rem; color: var(--grey); padding-top: 0.15rem; }
+.copy-row::before { content: counter(c); grid-row: 1 / span 3; font-family: var(--mono); font-size: 0.86rem; color: var(--grey); padding-top: 0.15rem; }
 .copy-row:hover, .copy-row:focus-visible { background: var(--white); }
-.copy-row .mono { grid-column: 2; color: var(--ink2) !important; font-size: 0.66rem; }
+.copy-row .mono { grid-column: 2; color: var(--ink2) !important; font-size: 0.84rem; }
 .copy-row b { grid-column: 2; font-family: var(--serif); font-weight: 500; font-size: 1.02rem; line-height: 1.25; }
 .copy-row i { grid-column: 2; font-style: normal; font-size: 0.82rem; color: var(--ink2); line-height: 1.4; }
 .copy-row .copied { grid-column: 3; grid-row: 1 / span 3; align-self: center; color: var(--green) !important; }
@@ -498,12 +501,68 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .toc { flex: 1 0 auto; }
 .question { text-wrap: balance; }
 
-/* The connection between the articles of an issue: three steps down, from what everyone sees to the hidden insight. */
-.cover-link { display: grid; gap: 0.35rem; }
-.cover-link ol { display: grid; grid-template-columns: 1fr 1fr 1.7fr; gap: 0 1rem; align-items: stretch; }
-.cover-link li { display: grid; align-content: start; gap: 0.2rem; padding: 0.45rem 0 0; border-top: 1px solid var(--line); font-size: 0.84rem; line-height: 1.45; color: var(--ink2); }
-.cover-link li:nth-child(2) { margin-top: 0.7rem; }
-.cover-link li.hidden-step { margin-top: 1.4rem; border-top: 3px solid var(--gold); color: var(--ink); font-family: var(--serif); font-size: 0.98rem; }
-.cover-link li .mono { font-size: 0.7rem; }
-@media (max-width: 900px), (max-aspect-ratio: 1/1) { .cover-link ol { grid-template-columns: 1fr; } .cover-link li:nth-child(2), .cover-link li.hidden-step { margin-top: 0.5rem; } }
 @media (max-width: 900px), (max-aspect-ratio: 1/1) { .ent-row .issue-txt b, .ent-row .issue-txt i { white-space: normal; } }
+
+/* ===== Cover hierarchy (Anat, 2026-11-23): the question, then the issue's insight, then folds that open one at a time. */
+.cover-side { gap: 1rem; }
+.issue-nav-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.7rem; }
+.cover-side .question { font-size: clamp(2.2rem, 3.3vw, 3.6rem); margin: 0.15rem 0 0.5rem; }
+.cover-side .intro { font-size: 1.08rem; }
+.cover-link { display: grid; gap: 0.6rem; }
+.hidden-big { font-family: var(--serif); font-weight: 400; font-size: 1.5rem; line-height: 1.38; padding: 0.75rem 1.1rem; background: var(--white); border-inline-start: 5px solid var(--gold); box-shadow: 0 1px 2px rgb(46 46 43 / 8%); }
+.steps { display: grid; gap: 0.3rem; }
+.steps > div { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 1rem; align-items: baseline; }
+.steps dt { font-size: 0.86rem; font-weight: 600; color: var(--ink2); }
+.steps dd { font-size: 1rem; color: var(--ink2); line-height: 1.45; }
+.steps .to-hidden dt, .steps .to-hidden dd { color: var(--gold); }
+.folds { display: grid; border-bottom: 1px solid var(--line); }
+.folds details { border-top: 1px solid var(--line); }
+.folds summary { list-style: none; display: flex; align-items: baseline; gap: 0.8rem; padding: 0.6rem 0.2rem; cursor: pointer; font-family: var(--serif); font-weight: 500; font-size: 1.2rem; transition: background 0.15s; }
+.folds summary::-webkit-details-marker { display: none; }
+.folds summary::before { content: '+'; font-family: var(--mono); font-weight: 400; color: var(--gold); width: 1rem; flex: none; }
+.folds details[open] > summary::before { content: '−'; }
+.folds summary:hover { background: var(--white); }
+.folds summary b { font-family: var(--mono); font-weight: 400; font-size: 0.9rem; color: var(--grey); }
+.folds summary i { font-family: var(--sans); font-style: normal; font-size: 0.82rem; color: var(--ink2); background: var(--wash); padding: 0 0.5em; }
+.folds details > :not(summary) { margin-bottom: 0.8rem; }
+.folds .toc { flex: none; display: flex; flex-direction: column; justify-content: flex-start; }
+.folds .toc li { flex: none; min-height: 3.1rem; }
+.folds .toc a, .toc-head { grid-template-columns: 2.6rem minmax(0, 1fr) 10.5rem; }
+.folds .toc li.toc-head { display: grid; }
+.toc-head { gap: 0.9rem; padding: 0 0.6rem 0.3rem 0.3rem; border: 0 !important; min-height: 0 !important; font-size: 0.86rem; font-weight: 600; color: var(--ink2); }
+.toc-head span:first-child { text-align: center; }
+.folds .toc a > .src { justify-self: start; }
+.folds .toc-txt b { font-size: 1.28rem; }
+.folds .toc-txt i { font-size: 0.95rem; }
+.folds .cover-thread { box-shadow: none; border-top: 0; background: transparent; padding: 0 1.8rem; gap: 0.45rem; }
+.folds .cover-thread .insight { font-family: var(--serif); font-size: 1.3rem; }
+.folds .cover-thread .rule { display: flex; gap: 0.8rem; align-items: baseline; font-size: 1rem; }
+.folds .do.city { margin-inline: 1.8rem; font-size: 1.15rem; }
+.folds .legend { margin-inline: 1.8rem; border-top: 0; font-size: 0.95rem; gap: 0.5rem; }
+.legend dt { font-family: var(--sans); font-size: 0.86rem; font-weight: 600; color: var(--ink2); }
+@media (max-width: 900px), (max-aspect-ratio: 1/1) {
+  .folds .toc a, .toc-head { grid-template-columns: 2rem minmax(0, 1fr); }
+  .folds .toc a > .src { grid-column: 2; }
+  .toc-head span:last-child { display: none; }
+  .steps > div { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 0.6rem; }
+  .folds .cover-thread, .folds .do.city, .folds .legend { margin-inline: 0; padding-inline: 0; }
+}
+
+/* The next-issue screen: the finding first, the help folded (Anat, 2026-11-23). */
+.issues .lead-line { font-family: var(--serif); font-size: 1.45rem; line-height: 1.35; margin: 0.3rem 0 0.6rem; }
+.cand > .cat { margin-top: 0.4rem; }
+details.complete { padding: 0; background: transparent; gap: 0; }
+details.complete > summary { list-style: none; display: flex; align-items: baseline; gap: 0.8rem; padding: 0.6rem 0.2rem; cursor: pointer; border-top: 1px solid var(--line); font-family: var(--serif); font-weight: 500; font-size: 1.12rem; }
+details.complete > summary::-webkit-details-marker { display: none; }
+details.complete > summary::before { content: '+'; font-family: var(--mono); color: var(--gold); width: 1rem; }
+details.complete[open] > summary::before { content: '−'; }
+details.complete > summary b { font-family: var(--mono); font-weight: 400; font-size: 0.9rem; color: var(--grey); }
+details.complete[open] { background: var(--wash); padding: 0 0.8rem 0.7rem; }
+details.complete > .cat { margin: 0.2rem 0 0.4rem; font-weight: 400; }
+
+/* A row of chips opens with its name, so it is clear what the names are. */
+.chips-cat { align-self: center; margin-inline-end: 0.7rem; white-space: nowrap; }
+.seg .chips-cat { min-width: 0; }
+/* Lists of articles on the next-issue screen: the app stands in one column. */
+.cand li a { display: grid; grid-template-columns: minmax(0, 1fr) 10.5rem; align-items: baseline; }
+.cand li a > .src { justify-self: start; }

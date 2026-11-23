@@ -30,6 +30,12 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
   const order = [...issues].sort((a, b) => a.number - b.number);
   const leadTopic = topicOf(data, lead);
 
+  // An opened fold comes into view inside the panel, so what was asked for is in front of the reader.
+  const reveal = (e: React.SyntheticEvent<HTMLDetailsElement>) => {
+    const d = e.currentTarget;
+    if (d.open) requestAnimationFrame(() => d.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+  };
+
   const save = async (patch: Partial<Issue>) => {
     try {
       await edit('save_issue', { issue: { ...issue, ...patch } });
@@ -57,9 +63,9 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
 
       <section className="cover-side">
         <header>
-          <p className="mono kick">
-            השאלה של הגיליון
-            {order.length > 1 && (
+          {order.length > 1 && (
+            <p className="issue-nav-row">
+              <span className="cat">גיליונות</span>
               <span className="issue-nav" role="group" aria-label="מעבר בין גיליונות">
                 {order.map((i) => (
                   <Go key={i.id} to={{ issue: i.id }} className={`${i.id === issue.id ? 'on' : ''} ${i.status}`} title={`${i.title}: ${i.question}${i.status === 'draft' ? ' (בהכנה)' : ''}`}>
@@ -67,8 +73,8 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
                   </Go>
                 ))}
               </span>
-            )}
-          </p>
+            </p>
+          )}
           {desk ? (
             <div className="desk-fields">
               <label>שם הגיליון<input defaultValue={issue.title} onBlur={(e) => e.target.value.trim() !== issue.title && save({ title: e.target.value })} /></label>
@@ -84,85 +90,101 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
             </div>
           ) : (
             <>
+              <p className="cat">השאלה של הגיליון</p>
               <h2 className="question">{issue.question}</h2>
               <Para text={issue.intro} className="intro" />
             </>
           )}
         </header>
 
+        {/* The heart of the issue: what only all its articles together say, on top; the way to it, aligned, under it. */}
         {(issue.link_obvious || issue.link_under || issue.link_hidden) && (
           <section className="cover-link" aria-label="הקשר בין הכתבות בגיליון">
-            <p className="mono kick">למה הכתבות האלה יחד · מהגלוי אל הנסתר</p>
-            <ol>
-              {issue.link_obvious && <li><span className="mono">הגלוי</span><p>{marked(issue.link_obvious)}</p></li>}
-              {issue.link_under && <li><span className="mono">מתחתיו</span><p>{marked(issue.link_under)}</p></li>}
-              {issue.link_hidden && <li className="hidden-step"><span className="mono">הנסתר</span><p>{marked(issue.link_hidden)}</p></li>}
-            </ol>
+            <p className="cat">התובנה של הגיליון: מה שרק כל הכתבות יחד אומרות</p>
+            {issue.link_hidden && <p className="hidden-big">{marked(issue.link_hidden)}</p>}
+            <dl className="steps">
+              {issue.link_obvious && <div><dt>הגלוי</dt><dd>{marked(issue.link_obvious)}</dd></div>}
+              {issue.link_under && <div><dt>מתחתיו</dt><dd>{marked(issue.link_under)}</dd></div>}
+              {issue.link_hidden && <div className="to-hidden"><dt>ומכאן</dt><dd>התובנה שלמעלה</dd></div>}
+            </dl>
           </section>
         )}
 
-        <ol className="toc" aria-label="תוכן הגיליון">
-          {items.map((it, n) => {
-            const a = data.byKey.get(it.article_key)!;
-            const t = topicOf(data, a);
-            return (
-              <li key={a.key} style={{ '--c': t?.color ?? '#77756F' } as React.CSSProperties}>
-                <Go to={{ a: a.key, from }}>
-                  <span className="no">{String(n + 1).padStart(2, '0')}</span>
-                  <span className="toc-txt">
-                    <b>{plain(a.title)}</b>
-                    <i>{it.note || plain(a.lede)}</i>
-                  </span>
-                  <SourceTag source={a.source} article={a} />
-                </Go>
-              </li>
-            );
-          })}
-          {!items.length && <li className="empty">הגיליון עוד ריק. פותחים מאמר, ובשולחן העריכה מוסיפים אותו לגיליון.</li>}
-        </ol>
+        {/* The rest opens on request, one fold at a time, so the screen keeps one focus. */}
+        <div className="folds">
+          <details name="cover-fold" onToggle={reveal}>
+            <summary><span>הכתבות בגיליון</span><b>{items.length}</b></summary>
+            <ol className="toc" aria-label="תוכן הגיליון">
+              {items.length > 0 && <li className="toc-head" aria-hidden="true"><span>מס׳</span><span>הכתבה, ומה היא מוסיפה לשאלה</span><span>נכתב באפליקציה</span></li>}
+              {items.map((it, n) => {
+                const a = data.byKey.get(it.article_key)!;
+                const t = topicOf(data, a);
+                return (
+                  <li key={a.key} style={{ '--c': t?.color ?? '#77756F' } as React.CSSProperties}>
+                    <Go to={{ a: a.key, from }}>
+                      <span className="no">{String(n + 1).padStart(2, '0')}</span>
+                      <span className="toc-txt">
+                        <b>{plain(a.title)}</b>
+                        <i>{it.note || plain(a.lede)}</i>
+                      </span>
+                      <SourceTag source={a.source} article={a} />
+                    </Go>
+                  </li>
+                );
+              })}
+              {!items.length && <li className="empty">הגיליון עוד ריק. פותחים מאמר, ובשולחן העריכה מוסיפים אותו לגיליון.</li>}
+            </ol>
+          </details>
 
-        {thread && (
-          <div className="cover-thread">
-            <p className="mono kick">
-              {golden ? 'החוט המוזהב של הגיליון' : 'חוט מהגיליון'}
-              {thread.status === 'proposed' && <span>הצעה, מחכה להחלטה</span>}
-              {threads.length > 1 && <button className="link" onClick={() => setPick((p) => p + 1)}>חוט אחר</button>}
-            </p>
-            <p className="pair">
-              <Go to={{ a: thread.a_key, from }}>{plain(data.byKey.get(thread.a_key)!.title)}</Go>
-              <span className="knot" aria-hidden="true" />
-              <Go to={{ a: thread.b_key, from }}>{plain(data.byKey.get(thread.b_key)!.title)}</Go>
-            </p>
-            <p className="rule">{thread.rule}</p>
-            <p className="insight">{marked(thread.insight)}</p>
-            {!issue.city && <p className="do"><span className="mono">בעיר</span>{thread.action}</p>}
-          </div>
-        )}
+          {thread && (
+            <details name="cover-fold" onToggle={reveal}>
+              <summary><span>{golden ? 'החוט המוזהב: שתי כתבות שמחזיקות זו את זו' : 'חוט מהגיליון'}</span>{thread.status === 'proposed' && <i>הצעה</i>}</summary>
+              <div className="cover-thread">
+                <p className="pair">
+                  <Go to={{ a: thread.a_key, from }}>{plain(data.byKey.get(thread.a_key)!.title)}</Go>
+                  <span className="knot" aria-hidden="true" />
+                  <Go to={{ a: thread.b_key, from }}>{plain(data.byKey.get(thread.b_key)!.title)}</Go>
+                </p>
+                <p className="insight">{marked(thread.insight)}</p>
+                <p className="rule"><span className="cat">למה</span>{thread.rule}</p>
+                {!issue.city && thread.action && <p className="do"><span className="mono">בעיר</span>{thread.action}</p>}
+                {threads.length > 1 && <button className="link" onClick={() => setPick((p) => p + 1)}>חוט אחר</button>}
+              </div>
+            </details>
+          )}
 
-        {issue.city && <p className="do city"><span className="mono">לעיר</span>{issue.city}</p>}
+          {issue.city && (
+            <details name="cover-fold" onToggle={reveal}>
+              <summary><span>לעיר: מה הגיליון מציע לעשות</span></summary>
+              <p className="do city">{issue.city}</p>
+            </details>
+          )}
 
-        {items.length > 0 && (
-          <dl className="legend" aria-label="מקרא הגיליון">
-            <div>
-              <dt className="mono">מקרא · נכתב ב</dt>
-              <dd>{apps.map(({ s, n }) => <a key={s} className="src src-link" href={SOURCES[s].url} target="_blank" rel="noreferrer" title={`כניסה לאפליקציה ${SOURCES[s].label}`}>{SOURCES[s].label} · {n}</a>)}</dd>
-            </div>
-            <div>
-              <dt className="mono">צבע הפס · נושא</dt>
-              <dd>{topics.map(({ t, n }) => <Go key={t.id} to={{ view: 'library', topic: t.id }} className="lg-topic" style={{ '--c': t.color } as React.CSSProperties} title={`כל מאמרי הנושא ${t.label}`}>{t.label} · {n}</Go>)}</dd>
-            </div>
-            <div>
-              <dt className="mono">סימנים</dt>
-              <dd className="lg-signs">
-                <span><b className="no">01</b>המאמר הראשי</span>
-                <span><i className="ln solid" />חוט מאושר</span>
-                <span><i className="ln dashed" />חוט מוצע</span>
-                <span><u>שם אפליקציה</u>כניסה למאמר במקור</span>
-              </dd>
-            </div>
-          </dl>
-        )}
-
+          {items.length > 0 && (
+            <details name="cover-fold" onToggle={reveal}>
+              <summary><span>מקרא: מי כתב, באילו נושאים, ומה הסימנים</span></summary>
+              <dl className="legend" aria-label="מקרא הגיליון">
+                <div>
+                  <dt>נכתב באפליקציות</dt>
+                  <dd>{apps.map(({ s, n }) => <a key={s} className="src src-link" href={SOURCES[s].url} target="_blank" rel="noreferrer" title={`כניסה לאפליקציה ${SOURCES[s].label}`}>{SOURCES[s].label} · {n}</a>)}</dd>
+                </div>
+                <div>
+                  <dt>צבע הפס: הנושא</dt>
+                  <dd>{topics.map(({ t, n }) => <Go key={t.id} to={{ view: 'library', topic: t.id }} className="lg-topic" style={{ '--c': t.color } as React.CSSProperties} title={`כל מאמרי הנושא ${t.label}`}>{t.label} · {n}</Go>)}</dd>
+                </div>
+                <div>
+                  <dt>סימנים</dt>
+                  <dd className="lg-signs">
+                    <span><b className="no">01</b>המאמר הראשי</span>
+                    <span><i className="ln solid" />חוט מאושר</span>
+                    <span><i className="ln dashed" />חוט מוצע</span>
+                    <span><u>שם אפליקציה</u>כניסה למאמר במקור</span>
+                  </dd>
+                </div>
+              </dl>
+            </details>
+          )}
+        </div>
       </section>
     </main>
   );
