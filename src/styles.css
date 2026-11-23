@@ -492,3 +492,12 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 /* The contents never hide under the thread card: when a long question leaves too little room, the side column scrolls. */
 .toc { flex: 1 0 auto; }
 .question { text-wrap: balance; }
+
+/* The connection between the articles of an issue: three steps down, from what everyone sees to the hidden insight. */
+.cover-link { display: grid; gap: 0.35rem; }
+.cover-link ol { display: grid; grid-template-columns: 1fr 1fr 1.7fr; gap: 0 1rem; align-items: stretch; }
+.cover-link li { display: grid; align-content: start; gap: 0.2rem; padding: 0.45rem 0 0; border-top: 1px solid var(--line); font-size: 0.84rem; line-height: 1.45; color: var(--ink2); }
+.cover-link li:nth-child(2) { margin-top: 0.7rem; }
+.cover-link li.hidden-step { margin-top: 1.4rem; border-top: 3px solid var(--gold); color: var(--ink); font-family: var(--serif); font-size: 0.98rem; }
+.cover-link li .mono { font-size: 0.7rem; }
+@media (max-width: 900px), (max-aspect-ratio: 1/1) { .cover-link ol { grid-template-columns: 1fr; } .cover-link li:nth-child(2), .cover-link li.hidden-step { margin-top: 0.5rem; } }

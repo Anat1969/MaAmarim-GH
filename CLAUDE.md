@@ -34,6 +34,14 @@ Most articles are in no issue, and that is right.
   that is out; an issue lives at `?issue=<id>`.
 - An issue in preparation is shown to everyone, marked "בהכנה" (on the entrance, on the issues screen and in the switcher
   on the cover, `.issue-nav`), so Anat sees every issue without switching the desk on.
+- THE CONNECTION OF AN ISSUE (Anat, 2026-11-23: "בכל גליון יוסבר ויובן ותהיה תובנה חדשה על ומהקשר בין הכתבות שנבחרו...
+  חייב להיות קשר גלוי מנוסח לחיבור מהמובן מאליו לנסתר"): every issue says in words why its articles are together, in three
+  steps that go down like stairs: הגלוי (what everyone sees), מתחתיו (the pattern that joins them), הנסתר (a NEW insight that
+  no single article says and only the whole issue gives, one marked sentence first). `mag_issues.link_obvious`, `link_under`,
+  `link_hidden`; `.cover-link` in `Cover.tsx`, on the cover right under the question and above the contents, visible with no
+  scroll; edited on the desk (three fields). It is about ALL the articles of the issue, unlike the golden thread, which joins
+  two. The seven texts were written by Claude on 2026-11-23 from the articles themselves: proposals until Anat edits them.
+  An issue without it is not finished: the e2e test fails. When drafting a new issue, write its three steps with it.
 - Ripeness (`Issues.tsx`, `RIPE`): a question is ripe for an issue at 7 articles from 3 apps; otherwise the screen says what
   is missing. An unripe question is a pointer to what is worth writing next.
 - HOW TO COMPLETE A QUESTION (Anat, 2026-11-22: "חשוב גם שתיתן לי את הפתרון. איך אני משלימה את מה שחסר. איזה אפליקציה

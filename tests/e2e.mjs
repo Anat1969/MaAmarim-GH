@@ -20,6 +20,20 @@ ok(await page.locator('.ent-legend .lg-signs span').count() >= 4 && await page.l
 ok(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 2), 'the entrance fits the screen with no page scroll');
 await page.locator('.ent-row').last().click();
 ok(page.url().includes('issue=issue-01') && await page.locator('.hero h1').isVisible(), 'a row on the entrance is a way into its issue');
+// Every issue says in words why its articles are together: three steps, from what everyone sees to the hidden insight.
+{
+  const ids = await page.evaluate(async () => (await (await fetch('https://ktqmwpbzcnzkhjskqisy.supabase.co/rest/v1/mag_issues?select=id', { headers: { apikey: 'sb_publishable_IkreG7naPa1h-d4kGp1gpA_sLU4tg5q' } })).json()).map((r) => r.id));
+  let whole = 0, above = 0;
+  for (const id of ids) {
+    await page.goto(`${BASE}/?issue=${id}`, { waitUntil: 'networkidle' });
+    const steps = await page.locator('.cover-link li').count();
+    const hidden = await page.locator('.cover-link li.hidden-step mark').count();
+    if (steps === 3 && hidden >= 1) whole++;
+    if (await page.locator('.cover-link').evaluate((el) => el.getBoundingClientRect().bottom <= innerHeight && el.getBoundingClientRect().top < document.querySelector('.toc').getBoundingClientRect().top).catch(() => false)) above++;
+  }
+  ok(ids.length >= 7 && whole === ids.length, `every issue explains the connection between its articles in three steps, ending in a marked insight (${whole} of ${ids.length})`);
+  ok(above === ids.length, `the connection sits on the cover above the contents, visible without scrolling (${above} of ${ids.length})`);
+}
 await page.locator('.brand').click();
 ok(await page.locator('.ent-about h1').isVisible(), 'the name of the magazine returns to the entrance');
 
