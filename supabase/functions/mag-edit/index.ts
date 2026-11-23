@@ -100,6 +100,10 @@ const actions: Record<string, (p: P) => Promise<unknown>> = {
     const row = {
       id, number, title, question, intro: text(i.intro, 600), status,
       city: text(i.city, 240), thread_id: UUID.test(String(i.thread_id ?? '')) ? String(i.thread_id) : null,
+      // the connection between the articles, from the obvious to the hidden; a call that does not send it leaves it as it is
+      ...(i.link_obvious == null ? {} : { link_obvious: text(i.link_obvious, 240) }),
+      ...(i.link_under == null ? {} : { link_under: text(i.link_under, 240) }),
+      ...(i.link_hidden == null ? {} : { link_hidden: text(i.link_hidden, 400) }),
       published_at: status === 'published' ? (before?.[0]?.published_at ?? new Date().toISOString()) : null,
       updated_at: new Date().toISOString(),
     };

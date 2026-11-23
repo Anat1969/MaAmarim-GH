@@ -17,7 +17,7 @@ export interface Article {
 }
 
 export interface Topic { id: string; label: string; question: string; color: string; position: number }
-export interface Issue { id: string; number: number; title: string; question: string; intro: string; status: 'draft' | 'published'; published_at: string | null; /** "לעיר": the one action the issue proposes. */ city: string; /** The golden thread of the issue. */ thread_id: string | null }
+export interface Issue { id: string; number: number; title: string; question: string; intro: string; status: 'draft' | 'published'; published_at: string | null; /** "לעיר": the one action the issue proposes. */ city: string; /** The golden thread of the issue. */ thread_id: string | null; /** The connection between the articles of the issue, in three steps: what everyone sees, what lies under it, and the hidden: the new insight only the whole issue gives. */ link_obvious?: string; link_under?: string; link_hidden?: string }
 export interface IssueItem { issue_id: string; article_key: string; role: 'lead' | 'support'; position: number; note: string }
 export interface Thread { id: string; a_key: string; b_key: string; rule: string; insight: string; action: string; status: 'proposed' | 'approved' | 'rejected' }
 

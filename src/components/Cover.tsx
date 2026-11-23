@@ -75,6 +75,9 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
               <label>שם הגיליון<input defaultValue={issue.title} onBlur={(e) => e.target.value.trim() !== issue.title && save({ title: e.target.value })} /></label>
               <label>השאלה<input defaultValue={issue.question} onBlur={(e) => e.target.value.trim() !== issue.question && save({ question: e.target.value })} /></label>
               <label>טענת האוצרת (הדגשה ב-**כוכביות**)<textarea rows={3} defaultValue={issue.intro} onBlur={(e) => e.target.value.trim() !== issue.intro && save({ intro: e.target.value })} /></label>
+              <label>הקשר בין הכתבות, 1: הגלוי (מה שכולם רואים)<textarea rows={2} defaultValue={issue.link_obvious ?? ''} onBlur={(e) => e.target.value.trim() !== (issue.link_obvious ?? '') && save({ link_obvious: e.target.value })} /></label>
+              <label>2: מה שמתחתיו (הדפוס שמחבר)<textarea rows={2} defaultValue={issue.link_under ?? ''} onBlur={(e) => e.target.value.trim() !== (issue.link_under ?? '') && save({ link_under: e.target.value })} /></label>
+              <label>3: הנסתר (התובנה החדשה, הדגשה ב-**כוכביות**)<textarea rows={3} defaultValue={issue.link_hidden ?? ''} onBlur={(e) => e.target.value.trim() !== (issue.link_hidden ?? '') && save({ link_hidden: e.target.value })} /></label>
               <label>לעיר: פעולה אחת שהגיליון מציע<input defaultValue={issue.city} onBlur={(e) => e.target.value.trim() !== issue.city && save({ city: e.target.value })} /></label>
               <button className={`btn small ${issue.status === 'published' ? 'on' : ''}`} aria-pressed={issue.status === 'published'} onClick={() => save({ status: issue.status === 'published' ? 'draft' : 'published' })}>
                 {issue.status === 'published' ? 'מפורסם. לחיצה מחזירה לטיוטה' : 'טיוטה. לחיצה מפרסמת'}
@@ -87,6 +90,17 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
             </>
           )}
         </header>
+
+        {(issue.link_obvious || issue.link_under || issue.link_hidden) && (
+          <section className="cover-link" aria-label="הקשר בין הכתבות בגיליון">
+            <p className="mono kick">למה הכתבות האלה יחד · מהגלוי אל הנסתר</p>
+            <ol>
+              {issue.link_obvious && <li><span className="mono">הגלוי</span><p>{marked(issue.link_obvious)}</p></li>}
+              {issue.link_under && <li><span className="mono">מתחתיו</span><p>{marked(issue.link_under)}</p></li>}
+              {issue.link_hidden && <li className="hidden-step"><span className="mono">הנסתר</span><p>{marked(issue.link_hidden)}</p></li>}
+            </ol>
+          </section>
+        )}
 
         <ol className="toc" aria-label="תוכן הגיליון">
           {items.map((it, n) => {
