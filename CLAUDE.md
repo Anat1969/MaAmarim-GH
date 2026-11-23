@@ -162,6 +162,15 @@ Images are served small through Supabase image rendering (`img()` in `src/lib/su
 
 ## UI rules
 
+- ONE WAY TO EACH PLACE (Anat, 2026-11-23: "לא עמוסה, לא כפתורים מיותרים... אין צורך למקם את אותו כפתור ... גם בסרגל
+  ניווט וגם בסוף מאמר"): what the bar offers is not repeated on a page. Removed: the two buttons on the entrance, the footer of
+  three buttons on the cover, the second link to the source app at the end of an article (the top row keeps it), the list of
+  issues on the fourth tab (it lives on the entrance; the tab is now "הגיליון הבא"), and a button per row in "איך משלימים"
+  (the row itself copies the request, `.copy-row`). The e2e test fails when a page button points where a bar tab points.
+- ONE GRID FOR A LIST (Anat, 2026-11-23: "רשימת הטקסט תהיה מיושרת בגריד מסודר"): rows of a list share fixed column widths,
+  never `auto`, so a wide image cannot push the text. Entrance rows: `7rem 5.5rem minmax(0,1fr) 9.5rem`; the e2e test checks
+  that number, title and status stand on the same lines in every row. Cards side by side stack from the top (flex column,
+  footer pushed down), so a taller neighbour never opens a gap inside a shorter one.
 - Top bar: name (home), four content tabs, and the one A&I logo button. Nothing else.
 - Cover, reader and threads fit the screen with no page scroll; long text scrolls inside its frame. The library is a list and scrolls.
 - An image is never cropped (object-fit: contain, or its natural ratio). No image: a plate drawn from the topic colour.

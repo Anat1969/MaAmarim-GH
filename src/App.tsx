@@ -47,7 +47,6 @@ export default function App() {
 
   const items = useMemo<MenuItem[]>(() => [
     { label: 'שולחן העריכה', hint: desk ? 'פתוח: נושאים, גיליונות וחוטים ניתנים לעריכה' : 'נושא למאמר, סדר הגיליון, אישור חוטים', pressed: desk, onSelect: toggleDesk },
-    ...(desk ? [{ label: 'גיליונות והגיליון הבא', onSelect: () => go({ view: 'issues' }) }] : []),
     ...(article ? [{ label: 'הדפסת המאמר', hint: 'עמוד A4', onSelect: () => window.print() }] : []),
   ], [desk, toggleDesk, article]);
 
@@ -64,7 +63,7 @@ export default function App() {
           <Go to={latest ? { issue: latest.id } : {}} className={tab === 'cover' ? 'on' : ''}>הגיליון</Go>
           <Go to={{ view: 'library' }} className={tab === 'library' ? 'on' : ''}>כל המאמרים</Go>
           <Go to={{ view: 'threads' }} className={tab === 'threads' ? 'on' : ''}>חוטים</Go>
-          <Go to={{ view: 'issues' }} className={tab === 'issues' ? 'on' : ''}>גיליונות</Go>
+          <Go to={{ view: 'issues' }} className={tab === 'issues' ? 'on' : ''}>הגיליון הבא</Go>
         </nav>
         {desk && <span className="desk-tag mono">שולחן העריכה פתוח. כל שינוי נשמר מיד.</span>}
         <AIMenu items={items} status={status} />

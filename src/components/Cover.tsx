@@ -29,7 +29,6 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
   const topics = data.topics.map((t) => ({ t, n: inIssue.filter((a) => a.topic_id === t.id).length })).filter((x) => x.n);
   const order = [...issues].sort((a, b) => a.number - b.number);
   const leadTopic = topicOf(data, lead);
-  const approved = data.threads.filter((t) => t.status === 'approved').length;
 
   const save = async (patch: Partial<Issue>) => {
     try {
@@ -164,11 +163,6 @@ export default function Cover({ data, issue, issues, desk, onSaved, onError }: P
           </dl>
         )}
 
-        <footer className="cover-foot">
-          <Go to={{ view: 'library' }} className="btn">כל {data.articles.length} המאמרים</Go>
-          <Go to={{ view: 'threads' }} className="btn">{approved} חוטים מאושרים, {data.threads.filter((t) => t.status === 'proposed').length} מחכים</Go>
-          <Go to={{}} className="btn">כל הגיליונות</Go>
-        </footer>
       </section>
     </main>
   );
