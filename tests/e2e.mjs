@@ -141,10 +141,11 @@ for (const [src, min, host] of [['pras', 21, 'prasnovel-gh'], ['refua', 7, 'refu
   ok((await page.locator('.crumbs a.origin').getAttribute('href') ?? '').includes(`${host}.vercel.app/`) && await page.locator('.r-body .para, .r-body .pull, .r-body .insight').count() >= 2, `a ${src} article opens as blocks and links to itself in its app`);
 }
 await page.goto(`${BASE}/?view=issues`, { waitUntil: 'networkidle' });
-ok(await page.locator('.complete').count() >= 1 && await page.locator('.complete li .btn').count() >= 3, 'a question shows how to complete it: what to write, where, and a request ready to copy');
+ok(await page.locator('.complete').count() >= 1 && await page.locator('.complete .copy-row').count() >= 3, 'a question shows how to complete it: what to write, where, and a request ready to copy');
+ok(await page.locator('.complete .btn').count() === 0, 'no button per row: the row itself copies the request');
 await page.context().grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => undefined);
-await page.locator('.complete li .btn').first().click();
-ok((await page.locator('.complete li .btn').first().innerText()).includes('הועתק'), 'the request is copied in one click');
+await page.locator('.complete .copy-row').first().click();
+ok((await page.locator('.complete .copy-row').first().innerText()).includes('הועתק'), 'the request is copied in one click');
 
 await page.goto(`${BASE}/?view=threads`, { waitUntil: 'networkidle' });
 ok(await page.locator('.arc').count() >= 1, 'threads map draws the threads');
@@ -170,7 +171,19 @@ ok(await page.locator('.legend').count() === 1, 'the published issue carries a l
 
 await page.goto(`${BASE}/?view=issues`, { waitUntil: 'networkidle' });
 ok(await page.locator('.kind').count() === 1 && await page.locator('.cand .ripe').count() >= 1, 'the issues screen names the kind of magazine and says which question is ripe');
-ok(await page.locator('.issue-row').count() >= 1, 'issues are listed');
+ok(await page.locator('.issue-row').count() === 0, 'the list of issues lives on the entrance only, not again on the next-issue screen');
+// One way to each place (Anat, 2026-11-23): what the bar already offers is not repeated on the page.
+for (const path of ['/', '/?issue=issue-01', '/?view=library', '/?view=threads', '/?view=issues']) {
+  await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle' });
+  const dup = await page.evaluate(() => {
+    const bar = new Set([...document.querySelectorAll('.bar nav a')].map((a) => a.getAttribute('href')));
+    return [...document.querySelectorAll('main a')].filter((a) => a.classList.contains('btn') && bar.has(a.getAttribute('href'))).map((a) => a.textContent);
+  });
+  ok(dup.length === 0, `${path}: no button repeats a tab of the bar ${dup.join(' | ')}`);
+}
+await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+const cols = await page.evaluate(() => [...document.querySelectorAll('.ent-row')].map((r) => ['.num', '.issue-txt b', '.state'].map((q) => Math.round(r.querySelector(q).getBoundingClientRect().right)).join('/')));
+ok(cols.length >= 7 && new Set(cols).size === 1, `the issues on the entrance stand on one grid: number, title and status line up in every row (${new Set(cols).size} column sets)`);
 
 for (const [w, h] of [[1865, 1160], [1280, 720], [390, 844]]) {
   await page.setViewportSize({ width: w, height: h });

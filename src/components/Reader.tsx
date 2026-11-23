@@ -166,7 +166,7 @@ export default function Reader({ data, article, route, desk, onSaved, onError, o
           : failed ? <div className="empty-state"><h2>המאמר לא נטען</h2><p>החיבור למאגר נכשל. רענון הדף מנסה שוב.</p><button className="btn on" onClick={() => location.reload()}>רענון</button></div>
           : <p className="mono loading">טוען את המאמר</p>}
         <p className="origin-line">
-          נכתב באפליקציה <a href={SOURCES[article.source].url} target="_blank" rel="noreferrer">{SOURCES[article.source].label}</a>. {SOURCES[article.source].about} המגזין קורא אותו משם, ולא מחזיק עותק. <a href={originUrl(article)} target="_blank" rel="noreferrer">לפתיחת המאמר הזה שם</a>.
+          נכתב באפליקציה {SOURCES[article.source].label}. {SOURCES[article.source].about} המגזין קורא אותו משם, ולא מחזיק עותק.
         </p>
       </article>
 

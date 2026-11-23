@@ -4,9 +4,8 @@ import { SOURCES, SOURCE_IDS } from '../lib/sources';
 import { BUILD_IDEAS, NEW_QUESTIONS, WRITE_IDEAS } from '../data/ripen';
 import { edit } from '../lib/supabase';
 import { go } from '../lib/route';
-import { monthYear, plain } from '../lib/text';
-import { Go, Plate, SourceTag, topicOf } from './bits';
-import { img } from '../lib/supabase';
+import { plain } from '../lib/text';
+import { Go, SourceTag } from './bits';
 
 interface Props { data: Data; desk: boolean; onSaved: (m: string) => void; onError: (m: string) => void }
 
@@ -44,7 +43,7 @@ const prompt = (app: SourceId, question: string, label: string, title?: string) 
 function Copy({ text, children }: { text: string; children: React.ReactNode }) {
   const [done, setDone] = useState(false);
   return (
-    <button className={`btn small ${done ? 'on' : ''}`} title={text}
+    <button className={`copy-row ${done ? 'done' : ''}`} title={text}
       onClick={async () => {
         setDone(true); setTimeout(() => setDone(false), 1800);
         try { await navigator.clipboard.writeText(text); } catch {
@@ -55,7 +54,8 @@ function Copy({ text, children }: { text: string; children: React.ReactNode }) {
           try { document.execCommand('copy'); } finally { ta.remove(); }
         }
       }}>
-      {done ? 'הועתק' : children}
+      {children}
+      <span className="copied mono" aria-live="polite">{done ? 'הועתק' : ''}</span>
     </button>
   );
 }
@@ -71,28 +71,25 @@ function Complete({ id, label, question, list, ripe = false }: { id: string; lab
   const build = BUILD_IDEAS[id];
   return (
     <div className="complete">
-      <h4>{ripe ? 'איך מחזקים את הגיליון הזה' : 'איך משלימים'}</h4>
+      <h4>{ripe ? 'איך מחזקים את הגיליון הזה' : 'איך משלימים'}<span className="mono">לחיצה על שורה מעתיקה את הבקשה לשיחת הפיתוח</span></h4>
       <ol>
         {ideas.map((i) => (
-          <li key={i.app + i.title}>
+          <li key={i.app + i.title}><Copy text={prompt(i.app, question, label, i.title)}>
             <span className="mono">כתבה לכתוב ב{SOURCES[i.app].label}</span>
             <b>{i.title}</b><i>{i.why}</i>
-            <Copy text={prompt(i.app, question, label, i.title)}>העתקת הבקשה</Copy>
-          </li>
+          </Copy></li>
         ))}
         {others.map((s) => (
-          <li key={s}>
+          <li key={s}><Copy text={prompt(s, question, label)}>
             <span className="mono">אפליקציה שעוד לא כתבה על זה</span>
             <b>{SOURCES[s].label}</b><i>{SOURCES[s].about}</i>
-            <Copy text={prompt(s, question, label)}>העתקת הבקשה</Copy>
-          </li>
+          </Copy></li>
         ))}
         {build && (
-          <li>
+          <li><Copy text={`אני בונה אפליקציה חדשה: "${build.name}".\n${build.what}\nהיא צריכה לפרסם את הכתבות שלה כקובץ פתוח (articles.json), כדי שהן יופיעו במגזין "חוט" ויענו על השאלה "${question}".`}>
             <span className="mono">אפליקציה לבנות</span>
             <b>{build.name}</b><i>{build.what}</i>
-            <Copy text={`אני בונה אפליקציה חדשה: "${build.name}".\n${build.what}\nהיא צריכה לפרסם את הכתבות שלה כקובץ פתוח (articles.json), כדי שהן יופיעו במגזין "חוט" ויענו על השאלה "${question}".`}>העתקת הבקשה</Copy>
-          </li>
+          </Copy></li>
         )}
       </ol>
     </div>
@@ -100,8 +97,6 @@ function Complete({ id, label, question, list, ripe = false }: { id: string; lab
 }
 
 export default function Issues({ data, desk, onSaved, onError }: Props) {
-  // An issue in preparation is shown to everyone, marked as such (the entrance does the same).
-  const issues = data.issues;
   const next = candidates(data);
 
   // New questions: only those that are not a topic yet, with the articles of theirs that the collection really holds.
@@ -129,28 +124,8 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
   return (
     <main className="issues">
       <section>
-        <h1>{issues.length === 1 ? 'גיליון אחד יצא, והבא כבר מתגבש מהחוטים' : `${issues.length} גיליונות, כל אחד שואל שאלה אחת`}</h1>
+        <h1>{next.some((c) => !c.missing) ? 'הגיליון הבא: שאלות שהאוסף כבר יכול לשאת' : 'השאלות הבאות עוד לא בשלות, וזה מה שחסר להן'}</h1>
         <p className="small kind"><b>מגזין אוצֵר.</b> "כל המאמרים" הוא האוסף הקבוע: כל מה שנכתב באפליקציות. גיליון הוא תערוכה מתחלפת מתוכו: שאלה אחת, טענה אחת, עד שבעה מאמרים משלוש אפליקציות לפחות, חוט מוזהב אחד, ופעולה אחת לעיר.</p>
-        <div className="issue-rows">
-          {issues.map((i) => {
-            const its = data.items.filter((x) => x.issue_id === i.id).sort((a, b) => a.position - b.position);
-            const lead = data.byKey.get((its.find((x) => x.role === 'lead') ?? its[0])?.article_key ?? '');
-            return (
-              <Go key={i.id} to={{ issue: i.id }} className="issue-row">
-                <span className="issue-pic">{lead?.image ? <img src={img(lead.image, 480)} alt="" /> : lead ? <Plate article={lead} topic={topicOf(data, lead)} /> : null}</span>
-                <span className="num">{String(i.number).padStart(2, '0')}</span>
-                <span className="issue-txt">
-                  <b>{i.title}</b><i>{i.question}</i>
-                  <em>{its.map((x) => plain(data.byKey.get(x.article_key)?.title)).filter(Boolean).join(' · ')}</em>
-                </span>
-                <span className="mono">{i.status === 'draft' ? 'בהכנה' : monthYear(i.published_at)} · {its.length} מאמרים · {new Set(its.map((x) => data.byKey.get(x.article_key)?.source).filter(Boolean)).size} אפליקציות</span>
-              </Go>
-            );
-          })}
-        </div>
-      </section>
-      <section>
-        <h2>{next.some((c) => !c.missing) ? 'הגיליון הבא: שאלות שהאוסף כבר יכול לשאת' : 'השאלות הבאות עוד לא בשלות, וזה מה שחסר להן'}</h2>
         <p className="small">גיליון בשל כשיש לו לפחות {RIPE.articles} מאמרים מ-{RIPE.apps} אפליקציות. שאלה שלא בשלה מראה מה כדאי לכתוב עכשיו.</p>
         <div className="cands">
           {next.map((c) => (

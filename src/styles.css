@@ -115,8 +115,6 @@ q { quotes: '“' '”'; }
 .insight { font-size: 1.04rem; }
 .do { color: var(--green); font-size: 0.92rem; display: flex; gap: 0.6em; align-items: baseline; }
 .do .mono { color: var(--green); background: var(--green-wash); padding: 0 0.45em; flex: none; }
-.cover-foot { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
-.cover-foot .mono { margin-inline-start: auto; }
 
 .desk-fields { display: grid; gap: 0.5rem; }
 label { display: grid; gap: 0.2rem; font-size: 0.8rem; color: var(--ink2); }
@@ -291,7 +289,7 @@ input:focus, textarea:focus, select:focus { box-shadow: inset 0 0 0 2px var(--go
 .issue-txt i { font-style: normal; color: var(--ink2); font-size: 1.15rem; }
 .issue-txt em { font-style: normal; font-size: 0.88rem; color: var(--grey); }
 .cands { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.25rem; }
-.cand { display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 0.6rem; background: var(--white); box-shadow: 0 1px 2px rgb(46 46 43 / 8%); padding: 1.2rem 1.4rem; border-top: 4px solid var(--c); }
+.cand { display: flex; flex-direction: column; gap: 0.6rem; background: var(--white); box-shadow: 0 1px 2px rgb(46 46 43 / 8%); padding: 1.2rem 1.4rem; border-top: 4px solid var(--c); }
 .cand .mono { color: var(--c); }
 .cand h3 { font-family: var(--serif); font-weight: 400; font-size: 1.9rem; line-height: 1.15; }
 .count b { font-size: 1.2rem; font-weight: 600; }
@@ -299,7 +297,7 @@ input:focus, textarea:focus, select:focus { box-shadow: inset 0 0 0 2px var(--go
 .cand li { border-top: 1px solid var(--line); }
 .cand li a { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; padding: 0.45rem 0.2rem; font-family: var(--serif); font-size: 1.12rem; transition: background 0.15s; }
 .cand li a:hover { background: var(--paper); }
-.cand-foot { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.cand-foot { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: auto; }
 
 /* ---------- Dialog, toast ---------- */
 .dlg { border: 0; padding: 1.6rem 1.8rem; width: min(38rem, 92vw); background: var(--paper); box-shadow: 0 20px 60px rgb(0 0 0 / 30%); display: none; gap: 0.8rem; }
@@ -444,14 +442,18 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .ent-nums { display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: 1.6rem; padding-block: 0.7rem; border-block: 1px solid var(--line); }
 .ent-nums dd { font-family: var(--serif); font-weight: 300; font-size: 2.6rem; line-height: 1; }
 .ent-nums dt { font-family: var(--mono); font-size: 0.7rem; color: var(--ink2); margin-top: 0.2rem; }
-.ent-go { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .ent-issues { display: flex; flex-direction: column; gap: 0.7rem; min-height: 0; }
 .ent-issues h2 { font-family: var(--serif); font-weight: 400; font-size: 1.5rem; }
 .ent-rows { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 0.6rem; padding: 2px; }
-.ent-row { flex: 1 1 0; min-height: 5.2rem; max-height: 11rem; grid-template-columns: auto 5rem 1fr auto; border-inline-start: 6px solid var(--c); }
-.ent-row .issue-pic { height: 100%; aspect-ratio: 1; }
+.ent-row { flex: 1 1 0; min-height: 5.2rem; max-height: 11rem; border-inline-start: 6px solid var(--c);
+  /* One grid for every row: fixed columns, so a wide image never pushes the number or the title (Anat, 2026-11-23) */
+  grid-template-columns: 7rem 5.5rem minmax(0, 1fr) 9.5rem; }
+.ent-row .issue-txt { min-width: 0; }
+.ent-row .issue-txt b, .ent-row .issue-txt i { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ent-row .state { justify-self: start; }
+.ent-row .issue-pic { width: 100%; height: 100%; aspect-ratio: auto; }
 .ent-row .issue-txt b { font-size: clamp(1.4rem, 2.2vw, 2.2rem); }
-.ent-row .issue-txt em { display: flex; gap: 0.5em; align-items: center; flex-wrap: wrap; }
+.ent-row .issue-txt em { display: flex; gap: 0.3em 1.1em; align-items: center; flex-wrap: wrap; }
 .ent-row .lg-topic { color: var(--ink2); }
 .ent-row.draft .num { color: var(--grey); }
 .state { padding: 0.25em 0.7em; background: var(--wash); color: var(--ink2); white-space: nowrap; font-weight: 400; }
@@ -480,14 +482,17 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .complete { background: var(--wash); padding: 0.7rem 0.8rem; display: grid; gap: 0.5rem; }
 .complete h4 { font-family: var(--serif); font-weight: 500; font-size: 1.05rem; }
 .complete ol { display: grid; gap: 0.55rem; list-style: none; counter-reset: c; }
-.complete li { counter-increment: c; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) auto; column-gap: 0.5rem; row-gap: 0.1rem; align-items: start; border: 0 !important; }
-.complete li::before { content: counter(c); grid-row: 1 / span 3; font-family: var(--mono); font-size: 0.8rem; color: var(--grey); padding-top: 0.15rem; }
-.complete li .mono { grid-column: 2; color: var(--ink2) !important; font-size: 0.66rem; }
-.complete li b { grid-column: 2; font-family: var(--serif); font-weight: 500; font-size: 1.02rem; line-height: 1.25; }
-.complete li i { grid-column: 2; font-style: normal; font-size: 0.82rem; color: var(--ink2); line-height: 1.4; }
-.complete li .btn { grid-column: 3; grid-row: 1 / span 3; align-self: center; white-space: nowrap; }
-.cand { grid-template-rows: none !important; align-content: start; }
-@media (max-width: 900px) { .complete li { grid-template-columns: 1.4rem minmax(0, 1fr); } .complete li .btn { grid-column: 2; grid-row: auto; justify-self: start; margin-top: 0.3rem; } }
+.complete h4 { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; }
+.complete h4 .mono { font-family: var(--mono); font-weight: 400; font-size: 0.66rem; color: var(--ink2); }
+.complete li { counter-increment: c; border: 0 !important; }
+.copy-row { width: 100%; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr) 4rem; column-gap: 0.5rem; row-gap: 0.1rem; align-items: start; text-align: start; padding: 0.35rem 0.3rem; border: 0; background: transparent; color: inherit; font: inherit; cursor: copy; transition: background 0.15s; }
+.copy-row::before { content: counter(c); grid-row: 1 / span 3; font-family: var(--mono); font-size: 0.8rem; color: var(--grey); padding-top: 0.15rem; }
+.copy-row:hover, .copy-row:focus-visible { background: var(--white); }
+.copy-row .mono { grid-column: 2; color: var(--ink2) !important; font-size: 0.66rem; }
+.copy-row b { grid-column: 2; font-family: var(--serif); font-weight: 500; font-size: 1.02rem; line-height: 1.25; }
+.copy-row i { grid-column: 2; font-style: normal; font-size: 0.82rem; color: var(--ink2); line-height: 1.4; }
+.copy-row .copied { grid-column: 3; grid-row: 1 / span 3; align-self: center; color: var(--green) !important; }
+.copy-row.done { background: var(--green-wash); }
 
 /* The contents never hide under the thread card: when a long question leaves too little room, the side column scrolls. */
 .toc { flex: 1 0 auto; }
@@ -501,3 +506,4 @@ html.a4 .sec { margin-bottom: 1.1rem; }
 .cover-link li.hidden-step { margin-top: 1.4rem; border-top: 3px solid var(--gold); color: var(--ink); font-family: var(--serif); font-size: 0.98rem; }
 .cover-link li .mono { font-size: 0.7rem; }
 @media (max-width: 900px), (max-aspect-ratio: 1/1) { .cover-link ol { grid-template-columns: 1fr; } .cover-link li:nth-child(2), .cover-link li.hidden-step { margin-top: 0.5rem; } }
+@media (max-width: 900px), (max-aspect-ratio: 1/1) { .ent-row .issue-txt b, .ent-row .issue-txt i { white-space: normal; } }

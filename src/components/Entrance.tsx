@@ -44,10 +44,6 @@ export default function Entrance({ data }: { data: Data }) {
           <div><dd>{apps.length}</dd><dt>אפליקציות</dt></div>
           <div><dd>{approved}</dd><dt>חוטים מאושרים</dt></div>
         </dl>
-        <div className="ent-go">
-          <Go to={{ view: 'library' }} className="btn">האוסף: כל המאמרים</Go>
-          <Go to={{ view: 'threads' }} className="btn">מפת החוטים</Go>
-        </div>
       </section>
 
       <section className="ent-issues" aria-label="הגיליונות">
@@ -59,7 +55,7 @@ export default function Entrance({ data }: { data: Data }) {
               <span className="num">{String(i.number).padStart(2, '0')}</span>
               <span className="issue-txt">
                 <b>{i.title}</b><i>{i.question}</i>
-                <em><span className="lg-topic">{topic?.label ?? 'בלי נושא'}</span> · {its.length} מאמרים · {n} אפליקציות</em>
+                <em><span className="lg-topic">{topic?.label ?? 'בלי נושא'}</span><span>{its.length} מאמרים · {n} אפליקציות</span></em>
               </span>
               <span className={`state mono ${i.status}`}>{i.status === 'published' ? `יצא · ${monthYear(i.published_at)}` : 'בהכנה'}</span>
             </Go>
