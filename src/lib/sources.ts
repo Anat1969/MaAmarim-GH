@@ -12,6 +12,7 @@ export const SOURCES: Record<SourceId, { label: string; kind: string; url: strin
   olam: { label: 'עולם נעלם', kind: 'כתבה', url: 'https://olam-gh.vercel.app', about: 'גילויים, קשרים ודמויות לאורך הזמן.' },
   maslul: { label: 'מסלול', kind: 'קולקציה', url: 'https://meatsevetofna-gh.vercel.app', about: 'קולקציית אופנה מתוך השראה: תובנה אחת בשלוש חלופות.' },
   tzuna: { label: 'מזון, גוף ונפש', kind: 'כתבה', url: 'https://tzuna-gh.vercel.app', about: 'מזון וצומח בשלוש שכבות: ידוע, נאמר, מאמינים.' },
+  zikuk: { label: 'זיקוק DNA', kind: 'סיפור זיקוק', url: 'https://zikuk-dna.vercel.app', about: 'רעיון שזוקק לשישה גנים, והסיפור שלו מתובנה לתובנה.' },
 };
 
 /**
@@ -45,5 +46,6 @@ export function originUrl(article: Pick<Article, 'key' | 'source'>): string {
   if (article.source === 'chok') return `${base}/articles?law=${id}`;
   if (article.source === 'amirot') return `${base}/#/article?a=${id}`;
   if (article.source === 'tzuna') return `${base}/#/articles?a=${id}`;
+  if (article.source === 'zikuk') return `${base}/articles/${id}`;
   return `${base}/#/a/${id}`;
 }

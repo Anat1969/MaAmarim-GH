@@ -81,6 +81,32 @@ export default function ArticleBody({ article, raw, back }: { article: Article; 
     );
   }
 
+  if (article.source === 'zikuk') {
+    // A distillation story ("מתובנה לתובנה"): chapters that each end in one insight, then the insight drawn from them all.
+    return (
+      <>
+        {arr(raw.chapters).map((c, i) => (
+          <Sec key={i} title={`${String(i + 1).padStart(2, '0')} ${plain(c.heading)}`}>
+            <Para text={c.body} />
+            {c.insight && <p className="insight">{marked(`**${c.insight}**`)}</p>}
+          </Sec>
+        ))}
+        {raw.meta_insight && (
+          <Sec title="תובנה מתובנות">
+            <p className="insight">{marked(`**${raw.meta_insight}**`)}</p>
+            {raw.meta_explain && <Para text={raw.meta_explain} lead={false} />}
+          </Sec>
+        )}
+        {arr(raw.steps).length > 0 && (
+          <Sec title="מה זה אומר לתכנון" tone="do">
+            <ol className="steps-list">{arr(raw.steps).map((s, i) => <li key={i}>{String(s).replace(/^\s*\d+[.)]\s*/, '')}</li>)}</ol>
+          </Sec>
+        )}
+        {raw.question && <Sec title="שאלה לקורא" tone="quiet"><Para text={raw.question} lead={false} /></Sec>}
+      </>
+    );
+  }
+
   if (article.source === 'chok') {
     const law = (raw.law ?? {}) as Raw;
     return (
@@ -239,6 +265,17 @@ export function facts(article: Article, raw: Raw | null): { label: string; value
       { label: article.source === 'amirot' ? 'השאלה' : 'סוג', value: raw.kicker !== raw.zone ? raw.kicker : '' },
       { label: 'מקורות', value: arr(raw.notes).length ? String(arr(raw.notes).length) : '' },
       { label: 'התמונה', value: raw.credit },
+    ].filter((f) => f.value);
+  }
+  if (article.source === 'zikuk') {
+    const dna = (raw.dna ?? {}) as Raw;
+    const KIND: Record<string, string> = { distill: 'זיקוק', hybrid: 'הכלאה', mutation: 'מוטציה' };
+    return [
+      { label: 'הגנום', value: dna.title ?? (raw.kind === 'synthesis' ? `מבט על ${arr(raw.dna_ids).length} זיקוקים` : '') },
+      { label: 'עדשה', value: dna.lens },
+      { label: 'סוג', value: raw.kind === 'synthesis' ? 'סינתזה' : KIND[dna.kind] },
+      { label: 'משפט הזיקוק', value: dna.distillation },
+      { label: 'המתח', value: dna.tension },
     ].filter((f) => f.value);
   }
   if (article.source === 'mahut') {

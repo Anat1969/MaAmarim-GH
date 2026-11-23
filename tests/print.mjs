@@ -3,10 +3,10 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 const BASE = process.env.BASE ?? 'http://localhost:4173';
 const b = await chromium.launch(); const p = await b.newPage();
-const rows = await (await fetch('https://ktqmwpbzcnzkhjskqisy.supabase.co/rest/v1/mag_articles?select=key,raw&apikey=sb_publishable_IkreG7naPa1h-d4kGp1gpA_sLU4tg5q')).json();
+const rows = await (await fetch(`https://ktqmwpbzcnzkhjskqisy.supabase.co/rest/v1/${process.env.VIEW ?? 'mag_articles'}?select=key,raw&apikey=sb_publishable_IkreG7naPa1h-d4kGp1gpA_sLU4tg5q`)).json();
 rows.sort((a, c) => JSON.stringify(c.raw).length - JSON.stringify(a.raw).length);
 const of = (s) => rows.filter((r) => r.key.startsWith(s));
-const pick = process.env.ALL ? rows : [...of('mahut').slice(0, 3), ...of('mahut').slice(-1), ...of('culture').slice(0, 2), ...of('culture').slice(-1), ...of('ishy').slice(0, 2)];
+const pick = process.env.ALL ? rows : [...of('mahut').slice(0, 3), ...of('mahut').slice(-1), ...of('culture').slice(0, 2), ...of('culture').slice(-1), ...of('ishy').slice(0, 2), ...of('zikuk').slice(0, 2), ...of('zikuk').slice(-1)];
 let bad = 0;
 for (const r of pick) {
   await p.goto(`${BASE}/?a=${r.key}`, { waitUntil: 'networkidle' });
