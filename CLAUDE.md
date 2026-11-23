@@ -82,7 +82,7 @@ Vite + React 18 + TypeScript, plain CSS (`src/styles.css`), no router library: t
 ```bash
 npm run build
 npx vite preview --port 4173 & node tests/e2e.mjs     # 94 checks, reads live data, writes nothing
-node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all)
+node tests/print.mjs                                   # every article prints on one A4 page (ALL=1 for all, VIEW=mag_articles_next to check a view change)
 node tests/shots.mjs                                   # screenshots at 1865, 1280, 390 for the eye check
 ```
 Playwright comes from the global install: `ln -s "$(npm root -g)/playwright" node_modules/playwright`.
@@ -102,7 +102,7 @@ Playwright comes from the global install: `ln -s "$(npm root -g)/playwright" nod
 
 Sources today: `culture_articles` (מושגי תרבות, 85; the app is cultura-GH on Pages, NOT תרבות וגילוי), `mahut_articles` published (מהות, 20), `ishy_articles` published
 (מהמרחב הפנימי, 5), `chok_articles` joined to `chok_laws` (חוקי התנהגות, 2; key `chok:<law_id>`, the body is one text with
-`## heading` blocks that each end in a `**insight**` line; image from `chok_images`). `radar_articles` (relevant, with insight) is not an article of hers: it shows only as "מה קורא העולם" beside
+`## heading` blocks that each end in a `**insight**` line; image from `chok_images`). `zikuk_articles` joined to `zikuk_dnas` (זיקוק DNA, 13, published only; key `zikuk:<article id>`; title = `title_bold`, kicker = `title_light`, quote = the insight from insights, image = the genome's Midjourney image or its generated one, a synthesis takes the image of its first genome; hint = the genome's lens, `synthesis` for a synthesis; template: numbered chapters each ending in a marked insight, "תובנה מתובנות", "מה זה אומר לתכנון", "שאלה לקורא"; the link is `/articles/<id>`; connected 2026-11-23 at Anat's word: "ותמיד יעבור לאפליקציית המאמרים"; a new story written in that app arrives by itself). `radar_articles` (relevant, with insight) is not an article of hers: it shows only as "מה קורא העולם" beside
 an article of the same topic. To add a source: one more `union all` in the view, an entry in `src/lib/sources.ts`, a template in
 `ArticleBody.tsx`, hints in `mag_topic_map`, and the key prefix in `mag-edit` (`KEY`).
 NEW ARTICLES AND NEW APPS (Anat, 2026-11-21: "איך אתה דואג שמאמרים חדשים מאפליקציות חדשות יתווספו"): a new article in a
