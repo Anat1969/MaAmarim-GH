@@ -70,8 +70,9 @@ function Complete({ id, label, question, list, ripe = false }: { id: string; lab
   const others = SOURCE_IDS.filter((s) => !writing.has(s) && !ideas.some((i) => i.app === s)).slice(0, 3);
   const build = BUILD_IDEAS[id];
   return (
-    <div className="complete">
-      <h4>{ripe ? 'איך מחזקים את הגיליון הזה' : 'איך משלימים'}<span className="mono">לחיצה על שורה מעתיקה את הבקשה לשיחת הפיתוח</span></h4>
+    <details className="complete">
+      <summary><span>{ripe ? 'איך מחזקים את הגיליון הזה' : 'איך משלימים'}</span><b>{ideas.length + others.length + (build ? 1 : 0)} הצעות</b></summary>
+      <p className="cat">לחיצה על שורה מעתיקה את הבקשה לשיחת הפיתוח של האפליקציה</p>
       <ol>
         {ideas.map((i) => (
           <li key={i.app + i.title}><Copy text={prompt(i.app, question, label, i.title)}>
@@ -92,7 +93,7 @@ function Complete({ id, label, question, list, ripe = false }: { id: string; lab
           </Copy></li>
         )}
       </ol>
-    </div>
+    </details>
   );
 }
 
@@ -124,7 +125,8 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
   return (
     <main className="issues">
       <section>
-        <h1>{next.some((c) => !c.missing) ? 'הגיליון הבא: שאלות שהאוסף כבר יכול לשאת' : 'השאלות הבאות עוד לא בשלות, וזה מה שחסר להן'}</h1>
+        <h1>המלצה לעריכה לגיליון הבא</h1>
+        <p className="lead-line">{next.some((c) => !c.missing) ? <><mark>{next.filter((c) => !c.missing).length} שאלות כבר בשלות לגיליון.</mark> לכל אחת: הכתבות שעונות עליה, ומה עוד יחזק אותה.</> : 'השאלות הבאות עוד לא בשלות, וזה מה שחסר להן.'}</p>
         <p className="small kind"><b>מגזין אוצֵר.</b> "כל המאמרים" הוא האוסף הקבוע: כל מה שנכתב באפליקציות. גיליון הוא תערוכה מתחלפת מתוכו: שאלה אחת, טענה אחת, עד שבעה מאמרים משלוש אפליקציות לפחות, חוט מוזהב אחד, ופעולה אחת לעיר.</p>
         <p className="small">גיליון בשל כשיש לו לפחות {RIPE.articles} מאמרים מ-{RIPE.apps} אפליקציות. שאלה שלא בשלה מראה מה כדאי לכתוב עכשיו.</p>
         <div className="cands">
@@ -134,8 +136,9 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
               <h3>{c.topic.question}</h3>
               <p className="count"><b>{c.total}</b> מאמרים מ-<b>{c.apps}</b> אפליקציות, <b>{c.threads}</b> חוטים</p>
               <p className={`ripe ${c.missing ? 'no' : 'yes'}`}>{c.missing ? `עוד לא בשל. חסר: ${c.missing}.` : 'בשל לגיליון.'}</p>
-              <Complete id={c.topic.id} label={c.topic.label} question={c.topic.question} list={data.articles.filter((x) => x.topic_id === c.topic.id)} ripe={!c.missing} />
+              <p className="cat">הכתבות שכבר עונות על השאלה, ובאיזו אפליקציה נכתבו</p>
               <ul>{c.keys.slice(0, 7).map((k) => <li key={k}><Go to={{ a: k }}>{plain(data.byKey.get(k)!.title).split(':')[0]}<SourceTag source={data.byKey.get(k)!.source} article={data.byKey.get(k)!} /></Go></li>)}</ul>
+              <Complete id={c.topic.id} label={c.topic.label} question={c.topic.question} list={data.articles.filter((x) => x.topic_id === c.topic.id)} ripe={!c.missing} />
               <div className="cand-foot">
                 <Go to={{ view: 'library', topic: c.topic.id }} className="btn">לכל מאמרי הנושא</Go>
                 {desk && !c.missing && <button className="btn on" onClick={() => open(c)}>פתיחת טיוטת גיליון</button>}
@@ -157,6 +160,7 @@ export default function Issues({ data, desk, onSaved, onError }: Props) {
                 <p className="count">{q.why}</p>
                 <p className="count"><b>{q.list.length}</b> מאמרים מ-<b>{new Set(q.list.map((a) => a.source)).size}</b> אפליקציות כבר באוסף</p>
                 <p className={`ripe ${q.missing ? 'no' : 'yes'}`}>{q.missing ? `עוד לא בשלה. חסר: ${q.missing}.` : 'בשלה לגיליון.'}</p>
+                <p className="cat">הכתבות שכבר עונות על השאלה, ובאיזו אפליקציה נכתבו</p>
                 <ul>{q.list.map((a) => <li key={a.key}><Go to={{ a: a.key }}>{plain(a.title).split(':')[0]}<SourceTag source={a.source} article={a} /></Go></li>)}</ul>
                 <Complete id={q.id} label={q.label} question={q.question} list={q.list} ripe={!q.missing} />
                 <div className="cand-foot">

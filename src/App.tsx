@@ -63,7 +63,7 @@ export default function App() {
           <Go to={latest ? { issue: latest.id } : {}} className={tab === 'cover' ? 'on' : ''}>הגיליון</Go>
           <Go to={{ view: 'library' }} className={tab === 'library' ? 'on' : ''}>כל המאמרים</Go>
           <Go to={{ view: 'threads' }} className={tab === 'threads' ? 'on' : ''}>חוטים</Go>
-          <Go to={{ view: 'issues' }} className={tab === 'issues' ? 'on' : ''}>הגיליון הבא</Go>
+          <Go to={{ view: 'issues' }} className={tab === 'issues' ? 'on' : ''}>המלצה לעריכה לגיליון הבא</Go>
         </nav>
         {desk && <span className="desk-tag mono">שולחן העריכה פתוח. כל שינוי נשמר מיד.</span>}
         <AIMenu items={items} status={status} />

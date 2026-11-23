@@ -26,13 +26,29 @@ ok(page.url().includes('issue=issue-01') && await page.locator('.hero h1').isVis
   let whole = 0, above = 0;
   for (const id of ids) {
     await page.goto(`${BASE}/?issue=${id}`, { waitUntil: 'networkidle' });
-    const steps = await page.locator('.cover-link li').count();
-    const hidden = await page.locator('.cover-link li.hidden-step mark').count();
+    const steps = await page.locator('.cover-link .steps > div').count();
+    const hidden = await page.locator('.cover-link .hidden-big mark').count();
     if (steps === 3 && hidden >= 1) whole++;
-    if (await page.locator('.cover-link').evaluate((el) => el.getBoundingClientRect().bottom <= innerHeight && el.getBoundingClientRect().top < document.querySelector('.toc').getBoundingClientRect().top).catch(() => false)) above++;
+    // the insight is the first thing under the question, whole on screen, before every fold
+    if (await page.locator('.cover-link').evaluate((el) => el.getBoundingClientRect().bottom <= innerHeight && el.getBoundingClientRect().top < document.querySelector('.folds').getBoundingClientRect().top).catch(() => false)) above++;
   }
   ok(ids.length >= 7 && whole === ids.length, `every issue explains the connection between its articles in three steps, ending in a marked insight (${whole} of ${ids.length})`);
   ok(above === ids.length, `the connection sits on the cover above the contents, visible without scrolling (${above} of ${ids.length})`);
+  // Hierarchy (Anat, 2026-11-23): the insight is the largest text after the question, and the rest opens on request.
+  const sizes = await page.evaluate(() => ['.question', '.hidden-big', '.steps dd', '.intro'].map((q) => parseFloat(getComputedStyle(document.querySelector(q)).fontSize)));
+  ok(sizes[0] > sizes[1] && sizes[1] > sizes[2] && sizes[1] > sizes[3], `the insight stands between the question and the rest in size (${sizes.join(' > ')})`);
+  ok(await page.locator('.folds details').count() >= 3 && await page.locator('.folds details[open]').count() === 0 && await page.locator('.folds summary').first().isVisible(), 'articles, thread, city and legend wait in folds that open on request');
+  await page.locator('.folds summary').first().click();
+  await page.locator('.folds summary').nth(1).click();
+  ok(await page.locator('.folds details[open]').count() === 1, 'one fold open at a time');
+  ok(await page.locator('.toc-head').textContent().then((t) => (t ?? '').includes('נכתב באפליקציה')), 'the list of articles names its columns, including the app that wrote each');
+  ok(await page.locator('.issue-nav-row .cat').innerText().then((t) => t.includes('גיליונות')), 'the row of issue numbers says what it is');
+  // No text below 13px on any screen, at Anat's window
+  for (const path of ['/', '/?issue=issue-01', '/?view=library', '/?view=threads', '/?view=issues']) {
+    await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle' });
+    const tiny = await page.evaluate(() => [...document.querySelectorAll('main *')].filter((e) => e.childElementCount === 0 && e.textContent.trim() && e.offsetParent && parseFloat(getComputedStyle(e).fontSize) < 13).length);
+    ok(tiny === 0, `${path}: no text smaller than 13px (${tiny})`);
+  }
 }
 await page.locator('.brand').click();
 ok(await page.locator('.ent-about h1').isVisible(), 'the name of the magazine returns to the entrance');
@@ -41,6 +57,7 @@ await page.goto(`${BASE}/?issue=issue-01`, { waitUntil: 'networkidle' });
 ok(await page.locator('ai-menu .logo').isVisible().catch(() => false) || await page.locator('ai-menu').count() === 1, 'A&I logo button in the top bar');
 ok(!(await page.locator('header >> text=העתקת קישור').first().isVisible().catch(() => false)), 'no loose development buttons in the bar');
 ok(await page.locator('.hero h1').isVisible(), 'cover shows the issue title');
+await page.locator('.folds summary').first().click();
 const toc = await page.locator('.toc li a').count();
 ok(toc >= 3, `issue contents listed (${toc})`);
 ok(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 2), 'cover fits the screen with no page scroll');
@@ -144,6 +161,7 @@ await page.goto(`${BASE}/?view=issues`, { waitUntil: 'networkidle' });
 ok(await page.locator('.complete').count() >= 1 && await page.locator('.complete .copy-row').count() >= 3, 'a question shows how to complete it: what to write, where, and a request ready to copy');
 ok(await page.locator('.complete .btn').count() === 0, 'no button per row: the row itself copies the request');
 await page.context().grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => undefined);
+await page.locator('.complete > summary').first().click();
 await page.locator('.complete .copy-row').first().click();
 ok((await page.locator('.complete .copy-row').first().innerText()).includes('הועתק'), 'the request is copied in one click');
 
@@ -164,6 +182,7 @@ for (const id of ['issue-02', 'issue-03', 'issue-04', 'issue-05', 'issue-06', 'i
   ok(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 2), `${id} fits the screen with no page scroll`);
 }
 ok((await page.locator('.legend .src-link').first().getAttribute('href') ?? '').startsWith('https://'), 'a legend entry is a direct way into the app');
+await page.locator('.folds summary', { hasText: 'מקרא' }).click();
 await page.locator('.legend .lg-topic').first().click();
 ok(page.url().includes('view=library') && page.url().includes('topic='), 'a topic in the legend opens the collection on that topic');
 await page.goto(`${BASE}/?issue=issue-01`, { waitUntil: 'networkidle' });
